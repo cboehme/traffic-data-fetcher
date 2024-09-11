@@ -47,27 +47,41 @@ DATE_FORMAT="%Y%m%d"
 
 def init_argparse() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser()
-    parser.add_argument("-c", "--counter",
-                        help="id of the counter to fetch",
-                        type=int,
-                        choices=range(0, len(COUNTERS)),
-                        required=True)
-    parser.add_argument("-d", "--direction",
-                        help="direction of traffic to fetch",
-                        type=str,
-                        choices=["in", "out", "both"],
-                        default="both")
-    parser.add_argument("-g", "--granularity",
-                        help="granularity of the data to fetch",
-                        type=str,
-                        choices=["15min", "hourly", "daily", "weekly", "monthly"],
-                        default="hourly")
-    parser.add_argument("-f", "-from",
-                        help="fetch data starting at date",
-                        type=str)
-    parser.add_argument("-t", "--to",
-                        help="fetch data until date",
-                        type=str)
+    subparsers = parser.add_subparsers(dest="command")
+    list_parser = subparsers.add_parser("list", help="list available counters")
+
+    info_parser = subparsers.add_parser("info", help="print information about a counter")
+    info_parser.add_argument("-c", "--counter",
+                              help="id of the counter",
+                              type=int,
+                              choices=range(0, len(COUNTERS)),
+                              required=True)
+
+    fetch_parser = subparsers.add_parser("fetch", help='fetch counts')
+    fetch_parser.add_argument("-c", "--counter",
+                              help="ids of the counters to fetch",
+                              type=int,
+                              choices=range(0, len(COUNTERS)),
+                              #action="extend",
+                              #nargs="+", # FIXME: Ist das die korrekte Operation?
+                              required=True)
+    fetch_parser.add_argument("-d", "--direction",
+                              help="direction of traffic to fetch",
+                              type=str,
+                              choices=["in", "out", "both"],
+                              default="both")
+    fetch_parser.add_argument("-g", "--granularity",
+                              help="granularity of the data to fetch",
+                              type=str,
+                              choices=["15min", "hourly", "daily", "weekly",
+                                       "monthly"],
+                              default="hourly")
+    fetch_parser.add_argument("-f", "-from",
+                              help="fetch data starting at date",
+                              type=str)
+    fetch_parser.add_argument("-t", "--to",
+                              help="fetch data until date",
+                              type=str)
     return parser
 
 
@@ -98,23 +112,16 @@ def list_counters():
         print("%i: %s" % (i, counter["name"]))
 
 
-def show_info():
-    # Get counter-id from argv
-    # Fetch info
-    # Extract interesting values
-    parser = init_argparse()
-    args = parser.parse_args()
+def show_info(args):
     info = get_counter_info(COUNTERS[args.counter]["id"])
     print(info)
 
 
-def fetch_data():
-    parser = init_argparse()
-    args = parser.parse_args()
+def fetch_data(args):
     counter_id = COUNTERS[args.counter]["id"]
     counter_channel_id = counter_id + DIRECTION_BOTH
-    begin_date = None #"20150603"
-    end_date = None #"20150603"
+    begin_date = "20240801"
+    end_date = "20240805"
     step_size = STEP_15MIN
 
     counter_info = get_counter_info(counter_id)
@@ -135,6 +142,16 @@ def fetch_data():
         print(f"An error occured: {e}")
 
 
+def main():
+    args = init_argparse().parse_args()
+    if args.command == "list":
+        list_counters()
+    elif args.command == "info":
+        show_info(args)
+    elif args.command == "fetch":
+        fetch_data(args)
+
+
 if __name__ == "__main__":
-#    fetch_data()
-    show_info()
+    main()
+
