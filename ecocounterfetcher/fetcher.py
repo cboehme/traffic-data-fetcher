@@ -54,16 +54,14 @@ def init_argparse() -> argparse.ArgumentParser:
     info_parser.add_argument("-c", "--counter",
                               help="id of the counter",
                               type=int,
-                              choices=range(0, len(COUNTERS)),
                               required=True)
 
     fetch_parser = subparsers.add_parser("fetch", help='fetch counts')
     fetch_parser.add_argument("-c", "--counter",
                               help="ids of the counters to fetch",
                               type=int,
-                              choices=range(0, len(COUNTERS)),
                               #action="extend",
-                              #nargs="+", # FIXME: Ist das die korrekte Operation?
+                              #nargs="+",
                               required=True)
     fetch_parser.add_argument("-d", "--direction",
                               help="direction of traffic to fetch",
@@ -76,7 +74,7 @@ def init_argparse() -> argparse.ArgumentParser:
                               choices=["15min", "hourly", "daily", "weekly",
                                        "monthly"],
                               default="hourly")
-    fetch_parser.add_argument("-f", "-from",
+    fetch_parser.add_argument("-f", "--from",
                               help="fetch data starting at date",
                               type=str)
     fetch_parser.add_argument("-t", "--to",
@@ -97,32 +95,26 @@ def get_counter_info(counter_id: int):
     return resp.json()
 
 
-def get_counter_token(counter_id: int) -> str:
+def list_counters(domain: int):
     """
-    Gets ("security") token needed to download the counter’s data.
-    You can download once and store them locally since they are static.
-    Tokens are individual per counter_id.
+    Retrieves a list of all available counters in the given domain.
     """
-    data = get_counter_info(counter_id)
-    return data["token"]
 
+    url = f"https://www.eco-visio.net/api/aladdin/1.0.0/pbl/publicwebpageplus/{domain}"
 
-def list_counters():
-    for (i, counter) in enumerate(COUNTERS):
-        print("%i: %s" % (i, counter["name"]))
+    resp = requests.get(url, headers=HEADERS)
+    counters = resp.json()
+    for counter in counters:
+        print("%s: %s" % (counter["idPdc"], counter["nom"]))
 
 
 def show_info(args):
-    info = get_counter_info(COUNTERS[args.counter]["id"])
+    info = get_counter_info(args.counter)
     print(info)
 
 
-def fetch_data(args):
-    counter_id = COUNTERS[args.counter]["id"]
-    counter_channel_id = counter_id + DIRECTION_BOTH
-    begin_date = "20240801"
-    end_date = "20240805"
-    step_size = STEP_15MIN
+def fetch_data(domain, counter_id, direction, begin_date, end_date, step_size):
+    counter_channel_id = counter_id + direction
 
     counter_info = get_counter_info(counter_id)
     token = counter_info["token"]
@@ -132,26 +124,39 @@ def fetch_data(args):
     if end_date is None:
         end_date = date.today().strftime(DATE_FORMAT)
 
-    url = f"https://www.eco-visio.net/api/aladdin/1.0.0/pbl/publicwebpage/data/{counter_channel_id}?begin={begin_date}&end={end_date}&step={step_size}&domain={DOMAIN}&withNull=true&t={token}"
+    url = f"https://www.eco-visio.net/api/aladdin/1.0.0/pbl/publicwebpage/data/{counter_channel_id}?begin={begin_date}&end={end_date}&step={step_size}&domain={domain}&withNull=true&t={token}"
 
     try:
         response = requests.get(url, headers=HEADERS)
         response.raise_for_status()
         print(response.text)
     except Exception as e:
-        print(f"An error occured: {e}")
+        print(f"An error occurred: {e}")
 
 
 def main():
     args = init_argparse().parse_args()
     if args.command == "list":
-        list_counters()
+        list_counters(DOMAIN)
     elif args.command == "info":
         show_info(args)
     elif args.command == "fetch":
-        fetch_data(args)
+        direction_map = {
+            "in": DIRECTION_IN,
+            "out": DIRECTION_OUT,
+            "both": DIRECTION_BOTH
+        }
+        direction = direction_map[args.direction]
+        granularity_map = {
+            "15min": STEP_15MIN,
+            "hourly": STEP_1H,
+            "daily": STEP_1D,
+            "weekly": STEP_7D,
+            "monthly": STEP_1M
+        }
+        step_size = granularity_map[args.granularity]
+        fetch_data(DOMAIN, args.counter, direction, args.__dict__["from"], args.to, step_size)
 
 
 if __name__ == "__main__":
     main()
-
