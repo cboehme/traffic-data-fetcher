@@ -113,11 +113,12 @@ def show_info(args):
     print(info)
 
 
-def fetch_data(domain, counter_id, direction, begin_date, end_date, step_size):
+def fetch_data(counter_id, direction, begin_date, end_date, step_size):
     counter_channel_id = counter_id + direction
 
     counter_info = get_counter_info(counter_id)
     token = counter_info["token"]
+    domain = counter_info["domaine"]
 
     if begin_date is None:
         begin_date = date.fromisoformat(counter_info["date"]).strftime(DATE_FORMAT)
@@ -155,7 +156,8 @@ def main():
             "monthly": STEP_1M
         }
         step_size = granularity_map[args.granularity]
-        fetch_data(DOMAIN, args.counter, direction, args.__dict__["from"], args.to, step_size)
+        fetch_data(args.counter, direction, args.__dict__["from"], args.to,
+                   step_size)
 
 
 if __name__ == "__main__":
