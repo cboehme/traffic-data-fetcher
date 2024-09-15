@@ -1,11 +1,8 @@
 import argparse
 from datetime import date
 
-import requests
-
-DIRECTION_BOTH = 0
-DIRECTION_IN = 1000000
-DIRECTION_OUT = 2000000
+from ecocounterfetcher.apiclient import get_counter, \
+    get_all_counters_in_domain, get_data
 
 STEP_15MIN = 2
 STEP_1H = 3
@@ -14,13 +11,6 @@ STEP_7D = 5
 STEP_1M = 6
 
 DOMAIN_BONN = 4701
-
-# Faking headers is only for "obscurity":
-HEADERS = {
-    'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:85.0) Gecko/20100101 Firefox/85.0",
-}
-
-DATE_FORMAT="%Y%m%d"
 
 
 def init_argparse() -> argparse.ArgumentParser:
@@ -44,7 +34,7 @@ def init_argparse() -> argparse.ArgumentParser:
     fetch_parser.add_argument("-d", "--direction",
                               help="direction of traffic to fetch",
                               type=str,
-                              choices=["in", "out", "both"],
+                              choices=["a", "b", "both"],
                               default="both")
     fetch_parser.add_argument("-g", "--granularity",
                               help="granularity of the data to fetch",
@@ -61,56 +51,31 @@ def init_argparse() -> argparse.ArgumentParser:
     return parser
 
 
-def get_counter_info(counter_id: int):
-    """
-    Gets basic information about a counter such as its position,
-    starting date of the collection, etc.
-    """
-
-    url = f"https://www.eco-visio.net/api/aladdin/1.0.0/pbl/publicwebpage/{counter_id}?withNull=true"
-
-    resp = requests.get(url, headers=HEADERS)
-    return resp.json()
-
-
 def list_counters(domain: int):
-    """
-    Retrieves a list of all available counters in the given domain.
-    """
-
-    url = f"https://www.eco-visio.net/api/aladdin/1.0.0/pbl/publicwebpageplus/{domain}"
-
-    resp = requests.get(url, headers=HEADERS)
-    counters = resp.json()
+    counters = get_all_counters_in_domain(domain)
     for counter in counters:
         print("%s: %s" % (counter["idPdc"], counter["nom"]))
 
 
 def show_info(args):
-    info = get_counter_info(args.counter)
-    print(info)
+    counter = get_counter(args.counter)
+    print(counter)
 
 
-def fetch_data(counter_id, direction, begin_date, end_date, step_size):
-    counter_channel_id = counter_id + direction
+def fetch_data(counter_id, direction, from_, to, step_size):
+    counter_info = get_counter(counter_id)
 
-    counter_info = get_counter_info(counter_id)
-    token = counter_info["token"]
-    domain = counter_info["domaine"]
+    if from_ is None:
+        begin_date = date.fromisoformat(counter_info["date"])
+    else:
+        begin_date = date.fromisoformat(from_)
+    if to is None:
+        end_date = date.today()
+    else:
+        end_date = date.fromisoformat(to)
 
-    if begin_date is None:
-        begin_date = date.fromisoformat(counter_info["date"]).strftime(DATE_FORMAT)
-    if end_date is None:
-        end_date = date.today().strftime(DATE_FORMAT)
-
-    url = f"https://www.eco-visio.net/api/aladdin/1.0.0/pbl/publicwebpage/data/{counter_channel_id}?begin={begin_date}&end={end_date}&step={step_size}&domain={domain}&withNull=true&t={token}"
-
-    try:
-        response = requests.get(url, headers=HEADERS)
-        response.raise_for_status()
-        print(response.text)
-    except Exception as e:
-        print(f"An error occurred: {e}")
+    data = get_data(counter_info, direction, begin_date, end_date, step_size)
+    print(data)
 
 
 def main():
@@ -121,9 +86,9 @@ def main():
         show_info(args)
     elif args.command == "fetch":
         direction_map = {
-            "in": DIRECTION_IN,
-            "out": DIRECTION_OUT,
-            "both": DIRECTION_BOTH
+            "a": 0,
+            "b": 1,
+            "both": -1
         }
         direction = direction_map[args.direction]
         granularity_map = {
