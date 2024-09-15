@@ -1,9 +1,7 @@
 import argparse
-import datetime
-import textwrap
+from datetime import date
 
 import requests
-from datetime import date
 
 DIRECTION_BOTH = 0
 DIRECTION_IN = 1000000
