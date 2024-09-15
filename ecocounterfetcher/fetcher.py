@@ -5,26 +5,6 @@ import textwrap
 import requests
 from datetime import date
 
-COUNTERS = [
-    {"id": 100019809, "name": "5.01 BN - Kennedybrücke (Nordseite)"},
-    {"id": 100019810, "name": "5.02 BN - Kennedybrücke (Südseite)"},
-    {"id": 100019720, "name": "5.03 BN - Nordbrücke (Südseite)"},
-    {"id": 100019721, "name": "5.04 BN - Nordbrücke (Nordseite)"},
-    {"id": 100019722, "name": "5.05 BN - Südbrücke (Südseite)"},
-    {"id": 100019723, "name": "5.06 BN - Südbrücke (Nordbrücke)"},
-    {"id": 100019724, "name": "5.07 BN - Estermannufer"},
-    {"id": 100019728, "name": "5.08 BN - Von-Sandt-Ufer"},
-    {"id": 100019729, "name": "5.09 BN - Rhenusallee"},
-    {"id": 100019725, "name": "5.10 BN - Bröltalbahnweg"},
-    {"id": 100019726, "name": "5.11 BN - Brühler Straße"},
-    {'id': 100019727, 'name': '5.12 BN - Straßenburger Weg'},  # Guessed ID
-    {"id": 100027077, "name": "5.13 BN - Wilhelm-Spiritus-Ufer"},
-    {"id": 100027075, "name": "5.14 BN - John-J.-McCloy-Ufer"},
-    {"id": 100027076, "name": "5.15 BN - Hochwasserdamm Beuel"},
-    {"id": 100053563, "name": "5.16 BN - Joseph-Beuys-Allee"},
-    {"id": 100053256, "name": "5.17 BN - Rheinweg"}
-]
-
 DIRECTION_BOTH = 0
 DIRECTION_IN = 1000000
 DIRECTION_OUT = 2000000
@@ -35,7 +15,7 @@ STEP_1D = 4
 STEP_7D = 5
 STEP_1M = 6
 
-DOMAIN = 4701
+DOMAIN_BONN = 4701
 
 # Faking headers is only for "obscurity":
 HEADERS = {
@@ -85,8 +65,8 @@ def init_argparse() -> argparse.ArgumentParser:
 
 def get_counter_info(counter_id: int):
     """
-    Gets basic information about a counter such as position,
-    starting date of the collection etc.
+    Gets basic information about a counter such as its position,
+    starting date of the collection, etc.
     """
 
     url = f"https://www.eco-visio.net/api/aladdin/1.0.0/pbl/publicwebpage/{counter_id}?withNull=true"
@@ -138,7 +118,7 @@ def fetch_data(counter_id, direction, begin_date, end_date, step_size):
 def main():
     args = init_argparse().parse_args()
     if args.command == "list":
-        list_counters(DOMAIN)
+        list_counters(DOMAIN_BONN)
     elif args.command == "info":
         show_info(args)
     elif args.command == "fetch":
