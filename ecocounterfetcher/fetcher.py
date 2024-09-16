@@ -28,8 +28,8 @@ def init_argparse() -> argparse.ArgumentParser:
     fetch_parser.add_argument("-c", "--counter",
                               help="ids of the counters to fetch",
                               type=int,
-                              #action="extend",
-                              #nargs="+",
+                              action="extend",
+                              nargs="+",
                               required=True)
     fetch_parser.add_argument("-d", "--direction",
                               help="direction of traffic to fetch",
@@ -57,12 +57,17 @@ def list_counters(domain: int):
         print("%s: %s" % (counter["idPdc"], counter["nom"]))
 
 
-def show_info(args):
+def show_counter(args):
     counter = get_counter(args.counter)
     print(counter)
 
 
-def fetch_data(counter_id, direction, from_, to, step_size):
+def fetch_counters(counter_ids, direction, from_, to, step_size):
+    for counter_id in counter_ids:
+        _fetch_counter(counter_id, direction, from_, to, step_size)
+
+
+def _fetch_counter(counter_id, direction, from_, to, step_size):
     counter_info = get_counter(counter_id)
 
     if from_ is None:
@@ -83,7 +88,7 @@ def main():
     if args.command == "list":
         list_counters(DOMAIN_BONN)
     elif args.command == "info":
-        show_info(args)
+        show_counter(args)
     elif args.command == "fetch":
         direction_map = {
             "a": 0,
@@ -99,7 +104,7 @@ def main():
             "monthly": STEP_1M
         }
         step_size = granularity_map[args.granularity]
-        fetch_data(args.counter, direction, args.__dict__["from"], args.to,
+        fetch_counters(args.counter, direction, args.__dict__["from"], args.to,
                    step_size)
 
 
