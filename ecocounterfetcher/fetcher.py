@@ -1,4 +1,6 @@
 import argparse
+import csv
+import json
 from datetime import date
 
 from ecocounterfetcher.apiclient import get_counter, \
@@ -59,15 +61,23 @@ def list_counters(domain: int):
 
 def show_counter(args):
     counter = get_counter(args.counter)
-    print(counter)
+    print(json.dumps(counter, indent=4))
 
 
 def fetch_counters(counter_ids, direction, from_, to, step_size):
-    for counter_id in counter_ids:
-        _fetch_counter(counter_id, direction, from_, to, step_size)
+    with open("data.csv", "wt", encoding="UTF-8") as file:
+        csv_file = _open_csv(file, ["counter_id", "direction", "timestamp", "count"])
+        csv_file.writeheader()
+        for counter_id in counter_ids:
+            _fetch_counter(counter_id, direction, from_, to, step_size, csv_file)
 
 
-def _fetch_counter(counter_id, direction, from_, to, step_size):
+def _open_csv(file, field_names):
+    return csv.DictWriter(file, field_names, restval="",
+                          extrasaction="ignore", dialect="unix")
+
+
+def _fetch_counter(counter_id, direction, from_, to, step_size, csv_file):
     counter_info = get_counter(counter_id)
 
     if from_ is None:
@@ -80,7 +90,15 @@ def _fetch_counter(counter_id, direction, from_, to, step_size):
         end_date = date.fromisoformat(to)
 
     data = get_data(counter_info, direction, begin_date, end_date, step_size)
-    print(data)
+    for sample in data:
+        row = {
+            "counter_id": counter_id,
+            "direction": direction,
+            "timestamp": sample["date"],
+            "count": sample["comptage"]
+        }
+        csv_file.writerow(row)
+
 
 
 def main():
