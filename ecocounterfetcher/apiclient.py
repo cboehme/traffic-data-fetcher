@@ -39,18 +39,15 @@ def get_counter(counter_id: int):
         return {}
 
 
-def get_data(counter, channel: int, begin_date: date, end_date: date, step_size: int):
+def get_data(counter, channel_no: int, begin: date, end: date, step_size: int):
     """
     Gets the data collected by a counter in a given time range.
     """
-    if 0 <= channel < len(counter["channels"]):
-        counter_channel_id = counter["channels"][channel][id]
-    else:
-        counter_channel_id = counter["idPdc"]
+    channel_id = counter["channels"][channel_no]["id"]
     domain = counter["domaine"]
     token = counter["token"]
 
-    url = f"https://www.eco-visio.net/api/aladdin/1.0.0/pbl/publicwebpage/data/{counter_channel_id}?begin={begin_date.strftime(DATE_FORMAT)}&end={end_date.strftime(DATE_FORMAT)}&step={step_size}&domain={domain}&withNull=true&t={token}"
+    url = f"https://www.eco-visio.net/api/aladdin/1.0.0/pbl/publicwebpage/data/{channel_id}?begin={begin.strftime(DATE_FORMAT)}&end={end.strftime(DATE_FORMAT)}&step={step_size}&domain={domain}&withNull=true&t={token}"
     try:
         response = requests.get(url, headers=HEADERS)
         response.raise_for_status()
@@ -58,4 +55,3 @@ def get_data(counter, channel: int, begin_date: date, end_date: date, step_size:
     except Exception as e:
         print(f"An error occurred: {e}")
         return []
-

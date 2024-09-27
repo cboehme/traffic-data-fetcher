@@ -33,11 +33,6 @@ def init_argparse() -> argparse.ArgumentParser:
                               action="extend",
                               nargs="+",
                               required=True)
-    fetch_parser.add_argument("-d", "--direction",
-                              help="direction of traffic to fetch",
-                              type=str,
-                              choices=["a", "b", "both"],
-                              default="both")
     fetch_parser.add_argument("-g", "--granularity",
                               help="granularity of the data to fetch",
                               type=str,
@@ -57,6 +52,7 @@ def list_counters(domain: int):
     counters = get_all_counters_in_domain(domain)
     for counter in counters:
         print("%s: %s" % (counter["idPdc"], counter["nom"]))
+    print(json.dumps(counters, indent=4))
 
 
 def show_counter(args):
@@ -64,12 +60,12 @@ def show_counter(args):
     print(json.dumps(counter, indent=4))
 
 
-def fetch_counters(counter_ids, direction, from_, to, step_size):
+def fetch_counters(counter_ids, from_, to, step_size):
     with open("data.csv", "wt", encoding="UTF-8") as file:
-        csv_file = _open_csv(file, ["counter_id", "direction", "timestamp", "count"])
+        csv_file = _open_csv(file, ["counter_id", "sensor_no", "timestamp", "count"])
         csv_file.writeheader()
         for counter_id in counter_ids:
-            _fetch_counter(counter_id, direction, from_, to, step_size, csv_file)
+            _fetch_counter(counter_id, from_, to, step_size, csv_file)
 
 
 def _open_csv(file, field_names):
@@ -77,11 +73,11 @@ def _open_csv(file, field_names):
                           extrasaction="ignore", dialect="unix")
 
 
-def _fetch_counter(counter_id, direction, from_, to, step_size, csv_file):
-    counter_info = get_counter(counter_id)
+def _fetch_counter(counter_id, from_, to, step_size, csv_file):
+    counter = get_counter(counter_id)
 
     if from_ is None:
-        begin_date = date.fromisoformat(counter_info["date"])
+        begin_date = date.fromisoformat(counter["date"])
     else:
         begin_date = date.fromisoformat(from_)
     if to is None:
@@ -89,17 +85,31 @@ def _fetch_counter(counter_id, direction, from_, to, step_size, csv_file):
     else:
         end_date = date.fromisoformat(to)
 
-    data = get_data(counter_info, direction, begin_date, end_date, step_size)
-    for sample in data:
-        row = {
-            "counter_id": counter_id,
-            "direction": direction,
-            "timestamp": sample["date"],
-            "count": sample["comptage"]
-        }
-        csv_file.writerow(row)
+    data_per_sensor = [None] * counter["nbSens"]
+    for channel_no, channel in enumerate(counter["channels"]):
+        sensor_no = channel["sens"] - 1
+        data = get_data(counter, channel_no, begin_date, end_date, step_size)
+        if data_per_sensor[sensor_no] is None:
+            data_per_sensor[sensor_no] = data
+        else:
+            for sample_accumulated, sample in zip(data_per_sensor[sensor_no], data):
+                if sample_accumulated["date"] != sample["date"]:
+                    print("Warning: Timestamps do not match. This should not happen")
+                else:
+                    sample_accumulated["comptage"] += sample["comptage"]
+    _save_data(counter_id, data_per_sensor, csv_file)
 
 
+def _save_data(counter_id, data_per_sensor, csv_file):
+    for index, data in enumerate(data_per_sensor):
+        for sample in data:
+            row = {
+                "counter_id": counter_id,
+                "sensor": index + 1,
+                "timestamp": sample["date"],
+                "count": sample["comptage"]
+            }
+            csv_file.writerow(row)
 
 def main():
     args = init_argparse().parse_args()
@@ -108,12 +118,6 @@ def main():
     elif args.command == "info":
         show_counter(args)
     elif args.command == "fetch":
-        direction_map = {
-            "a": 0,
-            "b": 1,
-            "both": -1
-        }
-        direction = direction_map[args.direction]
         granularity_map = {
             "15min": STEP_15MIN,
             "hourly": STEP_1H,
@@ -122,8 +126,7 @@ def main():
             "monthly": STEP_1M
         }
         step_size = granularity_map[args.granularity]
-        fetch_counters(args.counter, direction, args.__dict__["from"], args.to,
-                   step_size)
+        fetch_counters(args.counter, args.__dict__["from"], args.to, step_size)
 
 
 if __name__ == "__main__":
