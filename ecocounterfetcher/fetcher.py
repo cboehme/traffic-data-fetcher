@@ -33,18 +33,22 @@ def init_argparse() -> argparse.ArgumentParser:
                               action="extend",
                               nargs="+",
                               required=True)
-    fetch_parser.add_argument("-g", "--granularity",
-                              help="granularity of the data to fetch",
+    fetch_parser.add_argument("-F", "--file",
+                              help="file for storing the fetched data. Data is stored as csv. Existing files are overwritten.",
                               type=str,
-                              choices=["15min", "hourly", "daily", "weekly",
-                                       "monthly"],
-                              default="hourly")
+                              required=True)
     fetch_parser.add_argument("-f", "--from",
                               help="fetch data starting at date",
                               type=str)
     fetch_parser.add_argument("-t", "--to",
                               help="fetch data until date",
                               type=str)
+    fetch_parser.add_argument("-g", "--granularity",
+                              help="granularity of the data to fetch",
+                              type=str,
+                              choices=["15min", "hourly", "daily", "weekly",
+                                       "monthly"],
+                              default="hourly")
     return parser
 
 
@@ -60,8 +64,8 @@ def show_counter(args):
     print(json.dumps(counter, indent=4))
 
 
-def fetch_counters(counter_ids, from_, to, step_size):
-    with open("data.csv", "wt", encoding="UTF-8") as file:
+def fetch_counters(counter_ids, from_, to, step_size, filename):
+    with open(filename, "wt", encoding="UTF-8") as file:
         csv_file = _open_csv(file, ["counter_id", "sensor_no", "timestamp", "count"])
         csv_file.writeheader()
         for counter_id in counter_ids:
@@ -105,7 +109,7 @@ def _save_data(counter_id, data_per_sensor, csv_file):
         for sample in data:
             row = {
                 "counter_id": counter_id,
-                "sensor": index + 1,
+                "sensor_no": index + 1,
                 "timestamp": sample["date"],
                 "count": sample["comptage"]
             }
@@ -126,7 +130,11 @@ def main():
             "monthly": STEP_1M
         }
         step_size = granularity_map[args.granularity]
-        fetch_counters(args.counter, args.__dict__["from"], args.to, step_size)
+        fetch_counters(args.counter,
+                       args.__dict__["from"],
+                       args.to,
+                       step_size,
+                       args.file)
 
 
 if __name__ == "__main__":
