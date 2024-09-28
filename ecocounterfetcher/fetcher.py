@@ -4,15 +4,21 @@ import json
 from datetime import date
 
 from ecocounterfetcher.apiclient import get_counter, \
-    get_all_counters_in_domain, get_data
-
-STEP_15MIN = 2
-STEP_1H = 3
-STEP_1D = 4
-STEP_7D = 5
-STEP_1M = 6
+    get_all_counters_in_domain, get_data, Step
 
 DOMAIN_BONN = 4701
+
+class GranularityAction(argparse.Action):
+    GRANULARITY_MAP = {
+        "15min": Step.QUARTER_OF_AN_HOUR,
+        "hourly": Step.HOUR,
+        "daily": Step.DAY,
+        "weekly": Step.WEEK,
+        "monthly": Step.MONTH
+    }
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        setattr(namespace, self.dest, self.GRANULARITY_MAP[values])
 
 
 def init_argparse() -> argparse.ArgumentParser:
@@ -48,7 +54,8 @@ def init_argparse() -> argparse.ArgumentParser:
                               type=str,
                               choices=["15min", "hourly", "daily", "weekly",
                                        "monthly"],
-                              default="hourly")
+                              default=Step.HOUR,
+                              action=GranularityAction)
     return parser
 
 
@@ -122,19 +129,8 @@ def main():
     elif args.command == "info":
         show_counter(args.counter)
     elif args.command == "fetch":
-        granularity_map = {
-            "15min": STEP_15MIN,
-            "hourly": STEP_1H,
-            "daily": STEP_1D,
-            "weekly": STEP_7D,
-            "monthly": STEP_1M
-        }
-        step_size = granularity_map[args.granularity]
-        fetch_counters(args.counter,
-                       args.__dict__["from"],
-                       args.to,
-                       step_size,
-                       args.file)
+        fetch_counters(args.counter, args.__dict__["from"], args.to,
+                       args.granularity, args.file)
 
 
 if __name__ == "__main__":
