@@ -59,8 +59,8 @@ def list_counters(domain: int):
     print(json.dumps(counters, indent=4))
 
 
-def show_counter(args):
-    counter = get_counter(args.counter)
+def show_counter(counter_id):
+    counter = get_counter(counter_id)
     print(json.dumps(counter, indent=4))
 
 
@@ -120,7 +120,7 @@ def main():
     if args.command == "list":
         list_counters(DOMAIN_BONN)
     elif args.command == "info":
-        show_counter(args)
+        show_counter(args.counter)
     elif args.command == "fetch":
         granularity_map = {
             "15min": STEP_15MIN,
