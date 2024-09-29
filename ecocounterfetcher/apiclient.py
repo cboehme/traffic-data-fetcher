@@ -20,11 +20,11 @@ class Step(Enum):
     MONTH = 6
 
 
-def get_all_counters_in_domain(domain: int):
+def get_all_counters_in_domain(domain_id: int):
     """
     Retrieves a list of all available counters in the given domain.
     """
-    url = f"https://www.eco-visio.net/api/aladdin/1.0.0/pbl/publicwebpageplus/{domain}"
+    url = f"https://www.eco-visio.net/api/aladdin/1.0.0/pbl/publicwebpageplus/{domain_id}"
     try:
         response = requests.get(url, headers=HEADERS)
         response.raise_for_status()
@@ -49,15 +49,11 @@ def get_counter(counter_id: int):
         return {}
 
 
-def get_data(counter, channel_no: int, begin: date, end: date, step_size: Step):
+def get_data(domain_id: int, channel_id: int, begin: date, end: date, step_size: Step, token: str):
     """
     Gets the data collected by a counter in a given time range.
     """
-    channel_id = counter["channels"][channel_no]["id"]
-    domain = counter["domaine"]
-    token = counter["token"]
-
-    url = f"https://www.eco-visio.net/api/aladdin/1.0.0/pbl/publicwebpage/data/{channel_id}?begin={begin.strftime(DATE_FORMAT)}&end={end.strftime(DATE_FORMAT)}&step={step_size.value}&domain={domain}&withNull=true&t={token}"
+    url = f"https://www.eco-visio.net/api/aladdin/1.0.0/pbl/publicwebpage/data/{channel_id}?begin={begin.strftime(DATE_FORMAT)}&end={end.strftime(DATE_FORMAT)}&step={step_size.value}&domain={domain_id}&withNull=true&t={token}"
     try:
         response = requests.get(url, headers=HEADERS)
         response.raise_for_status()

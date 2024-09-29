@@ -109,10 +109,13 @@ def _fetch_counter(counter_id, from_, to, step_size, csv_file):
     else:
         end_date = date.fromisoformat(to)
 
+    domain_id = counter["domaine"]
+    token = counter["token"]
     data_per_sensor = [None] * counter["nbSens"]
     for channel_no, channel in enumerate(counter["channels"]):
         sensor_no = channel["sens"] - 1
-        data = get_data(counter, channel_no, begin_date, end_date, step_size)
+        channel_id = counter["channels"][channel_no]["id"]
+        data = get_data(domain_id, channel_id, begin_date, end_date, step_size, token)
         if data_per_sensor[sensor_no] is None:
             data_per_sensor[sensor_no] = data
         else:
