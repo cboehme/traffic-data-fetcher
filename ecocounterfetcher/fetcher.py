@@ -6,8 +6,6 @@ from datetime import date
 from ecocounterfetcher.apiclient import get_counter, \
     get_all_counters_in_domain, get_data, Step
 
-DOMAIN_BONN = 4701
-
 class GranularityAction(argparse.Action):
     GRANULARITY_MAP = {
         "15min": Step.QUARTER_OF_AN_HOUR,
@@ -23,55 +21,70 @@ class GranularityAction(argparse.Action):
 
 def init_argparse() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser()
-    subparsers = parser.add_subparsers(dest="command")
+    subparsers = parser.add_subparsers(required=True)
+
     list_parser = subparsers.add_parser("list", help="list available counters")
+    list_parser.set_defaults(func=list_counters)
+    list_parser.add_argument("-d", "--domain",
+                             help="id of the domain",
+                             required=True,
+                             dest="domain_id",
+                             type=int)
 
     info_parser = subparsers.add_parser("info", help="print information about a counter")
+    info_parser.set_defaults(func=show_counter)
     info_parser.add_argument("-c", "--counter",
-                              help="id of the counter",
-                              type=int,
-                              required=True)
+                             help="id of the counter",
+                             required=True,
+                             dest="counter_id",
+                             type=int)
 
     fetch_parser = subparsers.add_parser("fetch", help='fetch counts')
+    fetch_parser.set_defaults(func=fetch_counters)
     fetch_parser.add_argument("-c", "--counter",
                               help="ids of the counters to fetch",
+                              required=True,
+                              dest="counter_ids",
                               type=int,
                               action="extend",
-                              nargs="+",
-                              required=True)
+                              nargs="+")
     fetch_parser.add_argument("-F", "--file",
                               help="file for storing the fetched data. Data is stored as csv. Existing files are overwritten.",
-                              type=str,
-                              required=True)
+                              required=True,
+                              dest="filename",
+                              type=str)
     fetch_parser.add_argument("-f", "--from",
                               help="fetch data starting at date",
+                              dest="from_",
                               type=str)
     fetch_parser.add_argument("-t", "--to",
                               help="fetch data until date",
+                              dest="to",
                               type=str)
     fetch_parser.add_argument("-g", "--granularity",
                               help="granularity of the data to fetch",
-                              type=str,
                               choices=["15min", "hourly", "daily", "weekly",
                                        "monthly"],
                               default=Step.HOUR,
+                              dest="step_size",
+                              type=str,
                               action=GranularityAction)
     return parser
 
 
-def list_counters(domain: int):
-    counters = get_all_counters_in_domain(domain)
+def list_counters(domain_id, **kwargs):
+    counters = get_all_counters_in_domain(domain_id)
     for counter in counters:
         print("%s: %s" % (counter["idPdc"], counter["nom"]))
     print(json.dumps(counters, indent=4))
 
 
-def show_counter(counter_id):
+def show_counter(counter_id, **kwargs):
     counter = get_counter(counter_id)
     print(json.dumps(counter, indent=4))
 
 
-def fetch_counters(counter_ids, from_, to, step_size, filename):
+def fetch_counters(counter_ids, from_, to, step_size, filename, **kwargs):
     with open(filename, "wt", encoding="UTF-8") as file:
         csv_file = _open_csv(file, ["counter_id", "sensor_no", "timestamp", "count"])
         csv_file.writeheader()
@@ -122,15 +135,11 @@ def _save_data(counter_id, data_per_sensor, csv_file):
             }
             csv_file.writerow(row)
 
+
 def main():
     args = init_argparse().parse_args()
-    if args.command == "list":
-        list_counters(DOMAIN_BONN)
-    elif args.command == "info":
-        show_counter(args.counter)
-    elif args.command == "fetch":
-        fetch_counters(args.counter, args.__dict__["from"], args.to,
-                       args.granularity, args.file)
+    if hasattr(args, "func"):
+        args.func(**vars(args))
 
 
 if __name__ == "__main__":
