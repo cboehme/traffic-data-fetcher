@@ -86,7 +86,7 @@ def show_counter(counter_id, **kwargs):
 
 def fetch_counters(counter_ids, from_, to, step_size, filename, **kwargs):
     with open(filename, "wt", encoding="UTF-8") as file:
-        csv_file = _open_csv(file, ["counter_id", "sensor_no", "timestamp", "count"])
+        csv_file = _open_csv(file, ["counter_id", "means_of_transport", "direction", "timestamp", "count"])
         csv_file.writeheader()
         for counter_id in counter_ids:
             _fetch_counter(counter_id, from_, to, step_size, csv_file)
@@ -111,28 +111,30 @@ def _fetch_counter(counter_id, from_, to, step_size, csv_file):
 
     domain_id = counter["domaine"]
     token = counter["token"]
-    data_per_sensor = [None] * counter["nbSens"]
-    for channel_no, channel in enumerate(counter["channels"]):
-        sensor_no = channel["sens"] - 1
-        channel_id = counter["channels"][channel_no]["id"]
-        data = get_data(domain_id, channel_id, begin_date, end_date, step_size, token)
-        if data_per_sensor[sensor_no] is None:
-            data_per_sensor[sensor_no] = data
+    data = {}
+    for channel in counter["channels"]:
+        direction = channel["sens"]
+        means_of_transport = channel["userType"]
+        channel_id = channel["id"]
+        samples = get_data(domain_id, channel_id, begin_date, end_date, step_size, token)
+        if not (means_of_transport, direction) in data:
+            data[(means_of_transport, direction)] = samples
         else:
-            for sample_accumulated, sample in zip(data_per_sensor[sensor_no], data):
+            for sample_accumulated, sample in zip(data[(means_of_transport, direction)], samples):
                 if sample_accumulated["date"] != sample["date"]:
                     print("Warning: Timestamps do not match. This should not happen")
                 else:
                     sample_accumulated["comptage"] += sample["comptage"]
-    _save_data(counter_id, data_per_sensor, csv_file)
+    _save_data(counter_id, data, csv_file)
 
 
-def _save_data(counter_id, data_per_sensor, csv_file):
-    for index, data in enumerate(data_per_sensor):
-        for sample in data:
+def _save_data(counter_id, data, csv_file):
+    for (means_of_transport, direction), samples in data.items():
+        for sample in samples:
             row = {
                 "counter_id": counter_id,
-                "sensor_no": index + 1,
+                "means_of_transport": means_of_transport,
+                "direction": direction,
                 "timestamp": sample["date"],
                 "count": sample["comptage"]
             }
