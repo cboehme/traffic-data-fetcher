@@ -26,6 +26,20 @@ class Direction(Enum):
     NONE = 5
 
 
+class MeansOfTransport(Enum):
+    FOOT = 1
+    BIKE = 2
+    HORSE = 3
+    CAR = 4
+    BUS = 5
+    MINIBUS = 6
+    UNDEFINED = 7
+    MOTORCYCLE = 8
+    KAYAK = 9
+    E_SCOOTER = 13
+    TRUCK = 14
+
+
 def get_all_counters_in_domain(domain_id: int):
     """
     Retrieves a list of all available counters in the given domain.
