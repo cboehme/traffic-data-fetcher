@@ -20,6 +20,12 @@ class Step(Enum):
     MONTH = 6
 
 
+class Direction(Enum):
+    IN = 1
+    OUT = 2
+    NONE = 5
+
+
 def get_all_counters_in_domain(domain_id: int):
     """
     Retrieves a list of all available counters in the given domain.

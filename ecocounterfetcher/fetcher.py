@@ -4,7 +4,8 @@ import json
 from datetime import date
 
 from ecocounterfetcher.apiclient import get_counter, \
-    get_all_counters_in_domain, get_data, Step
+    get_all_counters_in_domain, get_data, Step, Direction
+
 
 class GranularityAction(argparse.Action):
     GRANULARITY_MAP = {
@@ -113,7 +114,7 @@ def _fetch_counter(counter_id, from_, to, step_size, csv_file):
     token = counter["token"]
     data = {}
     for channel in counter["channels"]:
-        direction = channel["sens"]
+        direction = Direction(channel["sens"])
         means_of_transport = channel["userType"]
         channel_id = channel["id"]
         samples = get_data(domain_id, channel_id, begin_date, end_date, step_size, token)
@@ -134,7 +135,7 @@ def _save_data(counter_id, data, csv_file):
             row = {
                 "counter_id": counter_id,
                 "means_of_transport": means_of_transport,
-                "direction": direction,
+                "direction": direction.name.lower(),
                 "timestamp": sample["date"],
                 "count": sample["comptage"]
             }
