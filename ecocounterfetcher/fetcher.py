@@ -5,6 +5,7 @@ from datetime import date
 
 from ecocounterfetcher.apiclient import get_counter, \
     get_all_counters_in_domain, get_data, Step, Direction, MeansOfTransport
+from ecocounterfetcher.commands import fetchsiteinfos
 
 
 class GranularityAction(argparse.Action):
@@ -23,6 +24,8 @@ class GranularityAction(argparse.Action):
 def init_argparse() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(required=True)
+
+    fetchsiteinfos.register_argparser(subparsers)
 
     list_parser = subparsers.add_parser("list", help="list available counters")
     list_parser.set_defaults(func=list_counters)
