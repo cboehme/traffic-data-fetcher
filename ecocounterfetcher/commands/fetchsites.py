@@ -3,6 +3,7 @@ import csv
 from enum import Enum
 
 from ecocounterfetcher import apiclient
+from ecocounterfetcher.apiclient import MeansOfTransport
 
 
 class Columns(Enum):
@@ -77,7 +78,7 @@ def _map_site_to_row(site):
         Columns.DIRECTION_IN.value: site["directionIn"],
         Columns.DIRECTION_OUT.value: site["directionOut"],
         Columns.MEANS_OF_TRANSPORT_COUNT.value: site["nbPratiques"],
-        Columns.MAIN_MEANS_OF_TRANSPORT.value: site["pratique"],
+        Columns.MAIN_MEANS_OF_TRANSPORT.value: MeansOfTransport(site["pratique"]).name.lower(),
         Columns.START_OF_COLLECTION.value: site["date"],
         Columns.MESSAGE.value: site["message"]
     }
