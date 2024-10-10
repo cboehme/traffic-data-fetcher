@@ -1,7 +1,5 @@
 import argparse
 import csv
-import json
-from textwrap import indent
 
 from ecocounterfetcher.apiclient import get_all_counters_in_domain, get_counter
 
