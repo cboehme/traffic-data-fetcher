@@ -3,9 +3,9 @@ import csv
 import json
 from datetime import date
 
-from ecocounterfetcher.apiclient import get_counter, \
-    get_all_counters_in_domain, get_data, Step, Direction, MeansOfTransport
-from ecocounterfetcher.commands import fetchsiteinfos
+from ecocounterfetcher.apiclient import fetch_site, fetch_sites_in_domain, \
+    get_data, Step, Direction, MeansOfTransport
+from ecocounterfetcher.commands import fetchsites
 
 
 class GranularityAction(argparse.Action):
@@ -25,7 +25,7 @@ def init_argparse() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(required=True)
 
-    fetchsiteinfos.register_argparser(subparsers)
+    fetchsites.register_argparser(subparsers)
 
     list_parser = subparsers.add_parser("list", help="list available counters")
     list_parser.set_defaults(func=list_counters)
@@ -77,14 +77,14 @@ def init_argparse() -> argparse.ArgumentParser:
 
 
 def list_counters(domain_id, **kwargs):
-    counters = get_all_counters_in_domain(domain_id)
+    counters = fetch_sites_in_domain(domain_id)
     for counter in counters:
         print("%s: %s" % (counter["idPdc"], counter["nom"]))
     print(json.dumps(counters, indent=4))
 
 
 def show_counter(counter_id, **kwargs):
-    counter = get_counter(counter_id)
+    counter = fetch_site(counter_id)
     print(json.dumps(counter, indent=4))
 
 
@@ -102,7 +102,7 @@ def _open_csv(file, field_names):
 
 
 def _fetch_counter(counter_id, from_, to, step_size, csv_file):
-    counter = get_counter(counter_id)
+    counter = fetch_site(counter_id)
 
     if from_ is None:
         begin_date = date.fromisoformat(counter["date"])

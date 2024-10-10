@@ -40,7 +40,7 @@ class MeansOfTransport(Enum):
     TRUCK = 14
 
 
-def get_all_counters_in_domain(domain_id: int):
+def fetch_sites_in_domain(domain_id: int):
     """
     Retrieves a list of all available counters in the given domain.
     """
@@ -54,7 +54,7 @@ def get_all_counters_in_domain(domain_id: int):
         return []
 
 
-def get_counter(counter_id: int):
+def fetch_site(counter_id: int):
     """
     Gets basic information about a counter such as its position,
     starting date of the collection, etc.
