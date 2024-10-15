@@ -32,10 +32,10 @@ class GranularityAction(argparse.Action):
 def register_argparser(subparsers):
     fetch_parser = subparsers.add_parser("fetch", help='fetch counts')
     fetch_parser.set_defaults(func=fetch_counters)
-    fetch_parser.add_argument("-c", "--counter",
-                              help="ids of the counters to fetch",
+    fetch_parser.add_argument("-s", "--sites",
+                              help="ids of the counter sites to fetch",
                               required=True,
-                              dest="counter_ids",
+                              dest="site_ids",
                               type=int,
                               action="extend",
                               nargs="+")
@@ -61,11 +61,12 @@ def register_argparser(subparsers):
                               type=str,
                               action=GranularityAction)
 
-def fetch_counters(counter_ids, from_, to, step_size, file, **kwargs):
+
+def fetch_counters(site_ids, from_, to, step_size, file, **kwargs):
     csv_file = _open_csv(file)
-    for counter_id in counter_ids:
-        data = _fetch_counter(counter_id, from_, to, step_size)
-        _save_data(counter_id, data, csv_file)
+    for site_id in site_ids:
+        data = _fetch_all_channels(site_id, from_, to, step_size)
+        _save_data(site_id, data, csv_file)
 
 
 def _open_csv(file):
@@ -75,8 +76,8 @@ def _open_csv(file):
     return csv_file
 
 
-def _fetch_counter(counter_id, from_, to, step_size):
-    site = apiclient.fetch_site(counter_id)
+def _fetch_all_channels(site_id, from_, to, step_size):
+    site = apiclient.fetch_site(site_id)
 
     if from_ is None:
         begin_date = date.fromisoformat(site["date"])
@@ -106,14 +107,19 @@ def _fetch_counter(counter_id, from_, to, step_size):
     return data
 
 
-def _save_data(counter_id, data, csv_file):
+def _save_data(site_id, data, csv_file):
     for (means_of_transport, direction), samples in data.items():
         for sample in samples:
-            row = {
-                Columns.COUNTER_ID: counter_id,
-                Columns.MEANS_OF_TRANSPORT: means_of_transport,
-                Columns.DIRECTION: direction,
-                Columns.TIMESTAMP: sample["date"],
-                Columns.COUNT: sample["comptage"]
-            }
+            row = _map_sample_to_row(site_id, means_of_transport, direction,
+                                     sample)
             csv_file.writerow(row)
+
+
+def _map_sample_to_row(site_id, means_of_transport, direction, sample):
+    return {
+        Columns.COUNTER_ID: site_id,
+        Columns.MEANS_OF_TRANSPORT: means_of_transport,
+        Columns.DIRECTION: direction,
+        Columns.TIMESTAMP: sample["date"],
+        Columns.COUNT: sample["comptage"]
+    }
