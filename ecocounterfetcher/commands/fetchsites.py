@@ -78,7 +78,7 @@ def _map_site_to_row(site):
         Columns.DIRECTION_IN: site["directionIn"],
         Columns.DIRECTION_OUT: site["directionOut"],
         Columns.MEANS_OF_TRANSPORT_COUNT: site["nbPratiques"],
-        Columns.MAIN_MEANS_OF_TRANSPORT: MeansOfTransport(site["pratique"]).name.lower(),
+        Columns.MAIN_MEANS_OF_TRANSPORT: MeansOfTransport(site["pratique"]),
         Columns.START_OF_COLLECTION: site["date"],
         Columns.MESSAGE: site["message"]
     }
