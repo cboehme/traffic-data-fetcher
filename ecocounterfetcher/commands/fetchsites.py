@@ -1,12 +1,12 @@
 import argparse
 import csv
-from enum import Enum
 
 from ecocounterfetcher import apiclient
 from ecocounterfetcher.apiclient import MeansOfTransport
+from ecocounterfetcher.types import EnumWithLowerCaseNames
 
 
-class Columns(Enum):
+class Columns(EnumWithLowerCaseNames):
     ID = "id"
     DOMAIN_ID = "domain_id"
     NAME = "name"
@@ -61,7 +61,7 @@ def _fetch_and_save_sites(file, site_ids):
 
 
 def _open_csv(file):
-    column_names = [column.value for column in Columns]
+    column_names = [column for column in Columns]
     csv_file = csv.DictWriter(file, column_names, restval="",
                               extrasaction="ignore", dialect="unix")
     csv_file.writeheader()
@@ -70,15 +70,15 @@ def _open_csv(file):
 
 def _map_site_to_row(site):
     return {
-        Columns.ID.value: site["idPdc"],
-        Columns.DOMAIN_ID.value: site["domaine"],
-        Columns.NAME.value: site["titre"],
-        Columns.LATITUDE.value: site["latitude"],
-        Columns.LONGITUDE.value: site["longitude"],
-        Columns.DIRECTION_IN.value: site["directionIn"],
-        Columns.DIRECTION_OUT.value: site["directionOut"],
-        Columns.MEANS_OF_TRANSPORT_COUNT.value: site["nbPratiques"],
-        Columns.MAIN_MEANS_OF_TRANSPORT.value: MeansOfTransport(site["pratique"]).name.lower(),
-        Columns.START_OF_COLLECTION.value: site["date"],
-        Columns.MESSAGE.value: site["message"]
+        Columns.ID: site["idPdc"],
+        Columns.DOMAIN_ID: site["domaine"],
+        Columns.NAME: site["titre"],
+        Columns.LATITUDE: site["latitude"],
+        Columns.LONGITUDE: site["longitude"],
+        Columns.DIRECTION_IN: site["directionIn"],
+        Columns.DIRECTION_OUT: site["directionOut"],
+        Columns.MEANS_OF_TRANSPORT_COUNT: site["nbPratiques"],
+        Columns.MAIN_MEANS_OF_TRANSPORT: MeansOfTransport(site["pratique"]).name.lower(),
+        Columns.START_OF_COLLECTION: site["date"],
+        Columns.MESSAGE: site["message"]
     }

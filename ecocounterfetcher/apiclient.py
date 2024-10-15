@@ -1,8 +1,8 @@
 from datetime import date
-from enum import Enum
 
 import requests
 
+from ecocounterfetcher.types import EnumWithLowerCaseNames
 
 # Faking headers is only for "obscurity":
 HEADERS = {
@@ -12,7 +12,7 @@ HEADERS = {
 DATE_FORMAT="%Y%m%d"
 
 
-class Step(Enum):
+class Step(EnumWithLowerCaseNames):
     QUARTER_OF_AN_HOUR = 2
     HOUR = 3
     DAY = 4
@@ -20,13 +20,13 @@ class Step(Enum):
     MONTH = 6
 
 
-class Direction(Enum):
+class Direction(EnumWithLowerCaseNames):
     IN = 1
     OUT = 2
     NONE = 5
 
 
-class MeansOfTransport(Enum):
+class MeansOfTransport(EnumWithLowerCaseNames):
     FOOT = 1
     BIKE = 2
     HORSE = 3
