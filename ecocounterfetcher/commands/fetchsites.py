@@ -62,8 +62,7 @@ def _fetch_and_save_sites(file, site_ids):
 
 
 def _open_csv(file):
-    column_names = [column for column in Columns]
-    csv_file = csv.DictWriter(file, column_names, restval="",
+    csv_file = csv.DictWriter(file, Columns, restval="",
                               extrasaction="ignore", dialect="unix")
     csv_file.writeheader()
     return csv_file
