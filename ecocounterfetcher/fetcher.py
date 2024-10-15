@@ -1,24 +1,8 @@
 import argparse
-import csv
 import json
-from datetime import date
 
-from ecocounterfetcher.apiclient import fetch_site, fetch_sites_in_domain, \
-    get_data, Step, Direction, MeansOfTransport
-from ecocounterfetcher.commands import fetchsites
-
-
-class GranularityAction(argparse.Action):
-    GRANULARITY_MAP = {
-        "15min": Step.QUARTER_OF_AN_HOUR,
-        "hourly": Step.HOUR,
-        "daily": Step.DAY,
-        "weekly": Step.WEEK,
-        "monthly": Step.MONTH
-    }
-
-    def __call__(self, parser, namespace, values, option_string=None):
-        setattr(namespace, self.dest, self.GRANULARITY_MAP[values])
+from ecocounterfetcher.apiclient import fetch_site, fetch_sites_in_domain
+from ecocounterfetcher.commands import fetchsites, fetchdata
 
 
 def init_argparse() -> argparse.ArgumentParser:
@@ -26,6 +10,7 @@ def init_argparse() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(required=True)
 
     fetchsites.register_argparser(subparsers)
+    fetchdata.register_argparser(subparsers)
 
     list_parser = subparsers.add_parser("list", help="list available counters")
     list_parser.set_defaults(func=list_counters)
@@ -43,36 +28,6 @@ def init_argparse() -> argparse.ArgumentParser:
                              dest="counter_id",
                              type=int)
 
-    fetch_parser = subparsers.add_parser("fetch", help='fetch counts')
-    fetch_parser.set_defaults(func=fetch_counters)
-    fetch_parser.add_argument("-c", "--counter",
-                              help="ids of the counters to fetch",
-                              required=True,
-                              dest="counter_ids",
-                              type=int,
-                              action="extend",
-                              nargs="+")
-    fetch_parser.add_argument("-F", "--file",
-                              help="file for storing the fetched data. Data is stored as csv. Existing files are overwritten.",
-                              required=True,
-                              dest="filename",
-                              type=str)
-    fetch_parser.add_argument("-f", "--from",
-                              help="fetch data starting at date",
-                              dest="from_",
-                              type=str)
-    fetch_parser.add_argument("-t", "--to",
-                              help="fetch data until date",
-                              dest="to",
-                              type=str)
-    fetch_parser.add_argument("-g", "--granularity",
-                              help="granularity of the data to fetch",
-                              choices=["15min", "hourly", "daily", "weekly",
-                                       "monthly"],
-                              default=Step.HOUR,
-                              dest="step_size",
-                              type=str,
-                              action=GranularityAction)
     return parser
 
 
@@ -88,61 +43,6 @@ def show_counter(counter_id, **kwargs):
     print(json.dumps(counter, indent=4))
 
 
-def fetch_counters(counter_ids, from_, to, step_size, filename, **kwargs):
-    with open(filename, "wt", encoding="UTF-8") as file:
-        csv_file = _open_csv(file, ["counter_id", "means_of_transport", "direction", "timestamp", "count"])
-        csv_file.writeheader()
-        for counter_id in counter_ids:
-            _fetch_counter(counter_id, from_, to, step_size, csv_file)
-
-
-def _open_csv(file, field_names):
-    return csv.DictWriter(file, field_names, restval="",
-                          extrasaction="ignore", dialect="unix")
-
-
-def _fetch_counter(counter_id, from_, to, step_size, csv_file):
-    counter = fetch_site(counter_id)
-
-    if from_ is None:
-        begin_date = date.fromisoformat(counter["date"])
-    else:
-        begin_date = date.fromisoformat(from_)
-    if to is None:
-        end_date = date.today()
-    else:
-        end_date = date.fromisoformat(to)
-
-    domain_id = counter["domaine"]
-    token = counter["token"]
-    data = {}
-    for channel in counter["channels"]:
-        direction = Direction(channel["sens"])
-        means_of_transport = MeansOfTransport(channel["userType"])
-        channel_id = channel["id"]
-        samples = get_data(domain_id, channel_id, begin_date, end_date, step_size, token)
-        if not (means_of_transport, direction) in data:
-            data[(means_of_transport, direction)] = samples
-        else:
-            for sample_accumulated, sample in zip(data[(means_of_transport, direction)], samples):
-                if sample_accumulated["date"] != sample["date"]:
-                    print("Warning: Timestamps do not match. This should not happen")
-                else:
-                    sample_accumulated["comptage"] += sample["comptage"]
-    _save_data(counter_id, data, csv_file)
-
-
-def _save_data(counter_id, data, csv_file):
-    for (means_of_transport, direction), samples in data.items():
-        for sample in samples:
-            row = {
-                "counter_id": counter_id,
-                "means_of_transport": means_of_transport.name.lower(),
-                "direction": direction.name.lower(),
-                "timestamp": sample["date"],
-                "count": sample["comptage"]
-            }
-            csv_file.writerow(row)
 
 
 def main():
