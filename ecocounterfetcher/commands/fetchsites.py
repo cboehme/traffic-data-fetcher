@@ -1,5 +1,6 @@
 import argparse
 import csv
+from enum import auto
 
 from ecocounterfetcher import apiclient
 from ecocounterfetcher.apiclient import MeansOfTransport
@@ -7,17 +8,17 @@ from ecocounterfetcher.types import EnumWithLowerCaseNames
 
 
 class Columns(EnumWithLowerCaseNames):
-    ID = "id"
-    DOMAIN_ID = "domain_id"
-    NAME = "name"
-    LATITUDE = "latitude"
-    LONGITUDE = "longitude"
-    DIRECTION_IN = "direction_in"
-    DIRECTION_OUT = "direction_out"
-    MEANS_OF_TRANSPORT_COUNT = "means_of_transport_count"
-    MAIN_MEANS_OF_TRANSPORT = "main_means_of_transport"
-    START_OF_COLLECTION = "start_of_collection"
-    MESSAGE = "message"
+    ID = auto()
+    DOMAIN_ID = auto()
+    NAME = auto()
+    LATITUDE = auto()
+    LONGITUDE = auto()
+    DIRECTION_IN = auto()
+    DIRECTION_OUT = auto()
+    MEANS_OF_TRANSPORT_COUNT = auto()
+    MAIN_MEANS_OF_TRANSPORT = auto()
+    START_OF_COLLECTION = auto()
+    MESSAGE = auto()
 
 
 def register_argparser(subparsers):
