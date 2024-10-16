@@ -4,7 +4,7 @@ from datetime import date
 from enum import auto
 
 from ecocounterfetcher import apiclient
-from ecocounterfetcher.apiclient import Step, Direction, MeansOfTransport
+from ecocounterfetcher.apiclient import StepSize, Direction, MeansOfTransport
 from ecocounterfetcher.types import EnumWithLowerCaseNames
 
 
@@ -18,11 +18,11 @@ class Columns(EnumWithLowerCaseNames):
 
 class GranularityAction(argparse.Action):
     GRANULARITY_MAP = {
-        "15min": Step.QUARTER_OF_AN_HOUR,
-        "hourly": Step.HOUR,
-        "daily": Step.DAY,
-        "weekly": Step.WEEK,
-        "monthly": Step.MONTH
+        "15min": StepSize.QUARTER_OF_AN_HOUR,
+        "hourly": StepSize.HOUR,
+        "daily": StepSize.DAY,
+        "weekly": StepSize.WEEK,
+        "monthly": StepSize.MONTH
     }
 
     def __call__(self, parser, namespace, values, option_string=None):
@@ -56,7 +56,7 @@ def register_argparser(subparsers):
                               help="granularity of the data to fetch",
                               choices=["15min", "hourly", "daily", "weekly",
                                        "monthly"],
-                              default=Step.HOUR,
+                              default=StepSize.HOUR,
                               dest="step_size",
                               type=str,
                               action=GranularityAction)
@@ -95,13 +95,15 @@ def _fetch_all_channels(site_id, from_, to, step_size):
         direction = Direction(channel["sens"])
         means_of_transport = MeansOfTransport(channel["userType"])
         channel_id = channel["id"]
-        samples = apiclient.get_data(domain_id, channel_id, begin_date, end_date, step_size, token)
+        samples = apiclient.fetch_channel(domain_id, channel_id, begin_date,
+                                          end_date, step_size, token)
+        print(f"Procesing channel {channel_id} with {means_of_transport} and {direction}")
         if not (means_of_transport, direction) in data:
             data[(means_of_transport, direction)] = samples
         else:
             for sample_accumulated, sample in zip(data[(means_of_transport, direction)], samples):
                 if sample_accumulated["date"] != sample["date"]:
-                    print("Warning: Timestamps do not match. This should not happen")
+                    print("Warning: Timestamps do not match. This should not happen: ", sample_accumulated["date"], sample["date"])
                 else:
                     sample_accumulated["comptage"] += sample["comptage"]
     return data

@@ -12,7 +12,7 @@ HEADERS = {
 DATE_FORMAT="%Y%m%d"
 
 
-class Step(EnumWithLowerCaseNames):
+class StepSize(EnumWithLowerCaseNames):
     QUARTER_OF_AN_HOUR = 2
     HOUR = 3
     DAY = 4
@@ -42,7 +42,7 @@ class MeansOfTransport(EnumWithLowerCaseNames):
 
 def fetch_sites_in_domain(domain_id: int):
     """
-    Retrieves a list of all available counters in the given domain.
+    Retrieves a list of all available counter sites in the given domain.
     """
     url = f"https://www.eco-visio.net/api/aladdin/1.0.0/pbl/publicwebpageplus/{domain_id}"
     try:
@@ -54,12 +54,12 @@ def fetch_sites_in_domain(domain_id: int):
         return []
 
 
-def fetch_site(counter_id: int):
+def fetch_site(site_id: int):
     """
-    Gets basic information about a counter such as its position,
+    Gets basic information about a counter site such as its position,
     starting date of the collection, etc.
     """
-    url = f"https://www.eco-visio.net/api/aladdin/1.0.0/pbl/publicwebpage/{counter_id}?withNull=true"
+    url = f"https://www.eco-visio.net/api/aladdin/1.0.0/pbl/publicwebpage/{site_id}?withNull=true"
     try:
         response = requests.get(url, headers=HEADERS)
         response.raise_for_status()
@@ -69,9 +69,9 @@ def fetch_site(counter_id: int):
         return {}
 
 
-def get_data(domain_id: int, channel_id: int, begin: date, end: date, step_size: Step, token: str):
+def fetch_channel(domain_id: int, channel_id: int, begin: date, end: date, step_size: StepSize, token: str):
     """
-    Gets the data collected by a counter in a given time range.
+    Gets the data collected in a channel at counter site in a given time range.
     """
     url = f"https://www.eco-visio.net/api/aladdin/1.0.0/pbl/publicwebpage/data/{channel_id}?begin={begin.strftime(DATE_FORMAT)}&end={end.strftime(DATE_FORMAT)}&step={step_size.value}&domain={domain_id}&withNull=true&t={token}"
     try:
