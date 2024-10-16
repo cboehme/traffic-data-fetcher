@@ -92,21 +92,51 @@ def _fetch_all_channels(site_id, begin, end, step_size):
     token = site["token"]
     data = {}
     for channel in site["channels"]:
-        direction = Direction(channel["sens"])
-        means_of_transport = MeansOfTransport(channel["userType"])
-        channel_id = channel["id"]
-        samples = apiclient.fetch_channel(domain_id, channel_id, begin_date,
-                                          end_date, step_size, token)
-        print(f"Procesing channel {channel_id} with {means_of_transport} and {direction}")
-        if not (means_of_transport, direction) in data:
-            data[(means_of_transport, direction)] = samples
-        else:
-            for sample_accumulated, sample in zip(data[(means_of_transport, direction)], samples):
-                if sample_accumulated["date"] != sample["date"]:
-                    print("Warning: Timestamps do not match. This should not happen: ", sample_accumulated["date"], sample["date"])
-                else:
-                    sample_accumulated["comptage"] += sample["comptage"]
+        fetch_and_merge_channel(data, channel, domain_id, begin_date, end_date,
+                                step_size, token)
     return data
+
+
+def fetch_and_merge_channel(data, channel, domain_id, begin_date, end_date,
+                            step_size, token):
+    direction = Direction(channel["sens"])
+    means_of_transport = MeansOfTransport(channel["userType"])
+    channel_id = channel["id"]
+    samples = apiclient.fetch_channel(domain_id, channel_id, begin_date,
+                                      end_date, step_size, token)
+    if not (means_of_transport, direction) in data:
+        data[(means_of_transport, direction)] = samples
+    else:
+        data[means_of_transport, direction] = merge_timeseries(data[means_of_transport, direction], samples)
+
+
+def merge_timeseries(data1, data2):
+    iter1 = iter(data1)
+    iter2 = iter(data2)
+    merged = []
+
+    try:
+        sample1 = next(iter1)
+        sample2 = next(iter2)
+
+        while True:
+            if sample1["date"] == sample2["date"]:
+                sample1["comptage"] += sample2["comptage"]
+                merged.append(sample1)
+                sample1 = next(iter1)
+                sample2 = next(iter2)
+            elif sample1["date"] < sample2["date"]:
+                merged.append(sample1)
+                sample1 = next(iter1)
+            else:
+                merged.append(sample2)
+                sample2 = next(iter2)
+    except StopIteration:
+        pass
+    # Append any remaining items from either iterator:
+    merged.extend(iter1)
+    merged.extend(iter2)
+    return merged
 
 
 def _save_data(site_id, data, csv_file):
