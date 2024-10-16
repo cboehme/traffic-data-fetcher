@@ -16,8 +16,8 @@ class Columns(EnumWithLowerCaseNames):
     COUNT = auto()
 
 
-class GranularityAction(argparse.Action):
-    GRANULARITY_MAP = {
+class StepSizeAction(argparse.Action):
+    OPTIONS_MAP = {
         "15min": StepSize.QUARTER_OF_AN_HOUR,
         "hourly": StepSize.HOUR,
         "daily": StepSize.DAY,
@@ -26,7 +26,7 @@ class GranularityAction(argparse.Action):
     }
 
     def __call__(self, parser, namespace, values, option_string=None):
-        setattr(namespace, self.dest, self.GRANULARITY_MAP[values])
+        setattr(namespace, self.dest, self.OPTIONS_MAP[values])
 
 
 def register_argparser(subparsers):
@@ -39,33 +39,33 @@ def register_argparser(subparsers):
                               type=int,
                               action="extend",
                               nargs="+")
-    fetch_parser.add_argument("-F", "--file",
+    fetch_parser.add_argument("-f", "--file",
                               help="file for storing the fetched data. Data is stored as csv. Existing files are overwritten.",
                               default="-",
                               dest="file",
                               type=argparse.FileType('wt', encoding='UTF-8'))
-    fetch_parser.add_argument("-f", "--from",
+    fetch_parser.add_argument("-b", "--begin",
                               help="fetch data starting at date",
-                              dest="from_",
+                              dest="begin",
                               type=str)
-    fetch_parser.add_argument("-t", "--to",
+    fetch_parser.add_argument("-e", "--end",
                               help="fetch data until date",
-                              dest="to",
+                              dest="end",
                               type=str)
-    fetch_parser.add_argument("-g", "--granularity",
-                              help="granularity of the data to fetch",
+    fetch_parser.add_argument("-S", "--step-size",
+                              help="step size of the data to fetch",
                               choices=["15min", "hourly", "daily", "weekly",
                                        "monthly"],
                               default=StepSize.HOUR,
                               dest="step_size",
                               type=str,
-                              action=GranularityAction)
+                              action=StepSizeAction)
 
 
-def fetch_counters(site_ids, from_, to, step_size, file, **kwargs):
+def fetch_counters(site_ids, begin, end, step_size, file, **kwargs):
     csv_file = _open_csv(file)
     for site_id in site_ids:
-        data = _fetch_all_channels(site_id, from_, to, step_size)
+        data = _fetch_all_channels(site_id, begin, end, step_size)
         _save_data(site_id, data, csv_file)
 
 
@@ -76,17 +76,17 @@ def _open_csv(file):
     return csv_file
 
 
-def _fetch_all_channels(site_id, from_, to, step_size):
+def _fetch_all_channels(site_id, begin, end, step_size):
     site = apiclient.fetch_site(site_id)
 
-    if from_ is None:
+    if begin is None:
         begin_date = date.fromisoformat(site["date"])
     else:
-        begin_date = date.fromisoformat(from_)
-    if to is None:
+        begin_date = date.fromisoformat(begin)
+    if end is None:
         end_date = date.today()
     else:
-        end_date = date.fromisoformat(to)
+        end_date = date.fromisoformat(end)
 
     domain_id = site["domaine"]
     token = site["token"]
