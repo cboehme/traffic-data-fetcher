@@ -29,6 +29,36 @@ class StepSizeAction(argparse.Action):
         setattr(namespace, self.dest, self.OPTIONS_MAP[values])
 
 
+class DirectionAction(argparse.Action):
+    OPTIONS_MAP = {
+        "in": Direction.IN,
+        "out": Direction.OUT,
+        "none": Direction.NONE
+    }
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        setattr(namespace, self.dest, [self.OPTIONS_MAP[value] for value in values])
+
+
+class MeansOfTransportAction(argparse.Action):
+    OPTIONS_MAP = {
+        "foot": MeansOfTransport.FOOT,
+        "bike": MeansOfTransport.BIKE,
+        "horse": MeansOfTransport.HORSE,
+        "car": MeansOfTransport.CAR,
+        "bus": MeansOfTransport.BUS,
+        "minibus": MeansOfTransport.MINIBUS,
+        "undefined": MeansOfTransport.UNDEFINED,
+        "motorcycle": MeansOfTransport.MOTORCYCLE,
+        "kayak": MeansOfTransport.KAYAK,
+        "e-scooter": MeansOfTransport.E_SCOOTER,
+        "truck": MeansOfTransport.TRUCK
+    }
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        setattr(namespace, self.dest, [self.OPTIONS_MAP[value] for value in values])
+
+
 def register_argparser(subparsers):
     fetch_parser = subparsers.add_parser("fetch", help='fetch counts')
     fetch_parser.set_defaults(func=fetch_counters)
@@ -39,6 +69,14 @@ def register_argparser(subparsers):
                               type=int,
                               action="extend",
                               nargs="+")
+    fetch_parser.add_argument("-S", "--step-size",
+                              help="step size of the data to fetch",
+                              choices=["15min", "hourly", "daily", "weekly",
+                                       "monthly"],
+                              default=StepSize.HOUR,
+                              dest="step_size",
+                              type=str,
+                              action=StepSizeAction)
     fetch_parser.add_argument("-f", "--file",
                               help="file for storing the fetched data. Data is stored as csv. Existing files are overwritten.",
                               default="-",
@@ -52,20 +90,24 @@ def register_argparser(subparsers):
                               help="fetch data until date",
                               dest="end",
                               type=str)
-    fetch_parser.add_argument("-S", "--step-size",
-                              help="step size of the data to fetch",
-                              choices=["15min", "hourly", "daily", "weekly",
-                                       "monthly"],
-                              default=StepSize.HOUR,
-                              dest="step_size",
+    fetch_parser.add_argument("-D", "--direction",
+                              help="select directions to fetch",
+                              dest="direction",
                               type=str,
-                              action=StepSizeAction)
+                              nargs="+",
+                              action=DirectionAction)
+    fetch_parser.add_argument("-M", "--means-of-transport",
+                              help="select means of transport to fetch",
+                              dest="means_of_transport",
+                              type=str,
+                              nargs="+",
+                              action=MeansOfTransportAction)
 
 
-def fetch_counters(site_ids, begin, end, step_size, file, **kwargs):
+def fetch_counters(site_ids, step_size, file, begin, end, direction, means_of_transport, **kwargs):
     csv_file = _open_csv(file)
     for site_id in site_ids:
-        data = _fetch_all_channels(site_id, begin, end, step_size)
+        data = _fetch_all_channels(step_size, site_id, begin, end, direction, means_of_transport)
         _save_data(site_id, data, csv_file)
 
 
@@ -76,7 +118,7 @@ def _open_csv(file):
     return csv_file
 
 
-def _fetch_all_channels(site_id, begin, end, step_size):
+def _fetch_all_channels(step_size, site_id, begin, end, direction, means_of_transport):
     site = apiclient.fetch_site(site_id)
 
     if begin is None:
@@ -87,20 +129,44 @@ def _fetch_all_channels(site_id, begin, end, step_size):
         end_date = date.today()
     else:
         end_date = date.fromisoformat(end)
+    if direction is None:
+        included_directions = [Direction.IN, Direction.OUT]
+    else:
+        included_directions = direction
+    if means_of_transport is None:
+        included_means_of_transport = [
+            MeansOfTransport.FOOT,
+            MeansOfTransport.BIKE,
+            MeansOfTransport.HORSE,
+            MeansOfTransport.CAR,
+            MeansOfTransport.BUS,
+            MeansOfTransport.MINIBUS,
+            MeansOfTransport.UNDEFINED,
+            MeansOfTransport.MOTORCYCLE,
+            MeansOfTransport.KAYAK,
+            MeansOfTransport.E_SCOOTER,
+            MeansOfTransport.TRUCK
+        ]
+    else:
+        included_means_of_transport = means_of_transport
 
     domain_id = site["domaine"]
     token = site["token"]
     data = {}
     for channel in site["channels"]:
         fetch_and_merge_channel(data, channel, domain_id, begin_date, end_date,
-                                step_size, token)
+                                step_size, included_directions, included_means_of_transport, token)
     return data
 
 
 def fetch_and_merge_channel(data, channel, domain_id, begin_date, end_date,
-                            step_size, token):
+                            step_size, included_directions, included_means_of_transport, token):
     direction = Direction(channel["sens"])
     means_of_transport = MeansOfTransport(channel["userType"])
+    if direction not in included_directions:
+        return
+    if means_of_transport not in included_means_of_transport:
+        return
     channel_id = channel["id"]
     samples = apiclient.fetch_channel(domain_id, channel_id, begin_date,
                                       end_date, step_size, token)
