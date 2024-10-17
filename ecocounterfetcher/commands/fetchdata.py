@@ -67,7 +67,6 @@ def register_argparser(subparsers):
                               required=True,
                               dest="site_ids",
                               type=int,
-                              action="extend",
                               nargs="+")
     fetch_parser.add_argument("-S", "--step-size",
                               help="step size of the data to fetch",

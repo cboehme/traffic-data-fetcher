@@ -33,7 +33,6 @@ def register_argparser(subparsers):
                        help="ids of the counter sites to fetch",
                        dest="site_ids",
                        type=int,
-                       action="extend",
                        nargs="+")
     parser.add_argument("-f", "--file",
                         help="file for storing the fetched data. Data is stored as csv. Existing files are overwritten.",
