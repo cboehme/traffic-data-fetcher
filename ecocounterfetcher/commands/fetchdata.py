@@ -62,12 +62,16 @@ class MeansOfTransportAction(argparse.Action):
 def register_argparser(subparsers):
     fetch_parser = subparsers.add_parser("fetch", help='fetch counts')
     fetch_parser.set_defaults(func=fetch_counters)
-    fetch_parser.add_argument("-s", "--sites",
-                              help="ids of the counter sites to fetch",
-                              required=True,
-                              dest="site_ids",
-                              type=int,
-                              nargs="+")
+    group = fetch_parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("-d", "--domain",
+                       help="id of the domain whose counter sites should be fetched",
+                       dest="domain_id",
+                       type=int)
+    group.add_argument("-s", "--sites",
+                       help="ids of the counter sites to fetch",
+                       dest="site_ids",
+                       type=int,
+                       nargs="+")
     fetch_parser.add_argument("-S", "--step-size",
                               help="step size of the data to fetch",
                               choices=["15min", "hourly", "daily", "weekly",
@@ -103,11 +107,19 @@ def register_argparser(subparsers):
                               action=MeansOfTransportAction)
 
 
-def fetch_counters(site_ids, step_size, file, begin, end, direction, means_of_transport, **kwargs):
+def fetch_counters(domain_id, site_ids, step_size, file, begin, end, direction, means_of_transport, **kwargs):
+    if domain_id is not None:
+        site_ids = _fetch_site_ids_for_domain(domain_id)
+
     csv_file = _open_csv(file)
     for site_id in site_ids:
         data = _fetch_all_channels(step_size, site_id, begin, end, direction, means_of_transport)
         _save_data(site_id, data, csv_file)
+
+
+def _fetch_site_ids_for_domain(domain_id):
+    sites = apiclient.fetch_sites_in_domain(domain_id)
+    return [site["idPdc"] for site in sites]
 
 
 def _open_csv(file):
