@@ -173,7 +173,7 @@ def _merge_timeseries(data1, data2):
 
     if sample1 is not None:
         merged.append(sample1)
-    elif sample2 is not None:
+    if sample2 is not None:
         merged.append(sample2)
 
     merged.extend(iter1)
