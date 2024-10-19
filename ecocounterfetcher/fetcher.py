@@ -1,7 +1,5 @@
 import argparse
-import json
 
-from ecocounterfetcher.apiclient import fetch_site, fetch_sites_in_domain
 from ecocounterfetcher.commands import fetchsites, fetchdata
 
 
