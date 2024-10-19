@@ -2,6 +2,7 @@ import argparse
 import csv
 from datetime import date
 from enum import auto
+from nntplib import NNTP_SSL
 
 from ecocounterfetcher import apiclient
 from ecocounterfetcher.apiclient import StepSize, Direction, MeansOfTransport
@@ -155,25 +156,26 @@ def _merge_timeseries(data1, data2):
     iter2 = iter(data2)
     merged = []
 
-    try:
-        sample1 = next(iter1)
-        sample2 = next(iter2)
+    sample1 = next(iter1, None)
+    sample2 = next(iter2, None)
+    while sample1 is not None and sample2 is not None:
+        if sample1["date"] == sample2["date"]:
+            sample1["comptage"] += sample2["comptage"]
+            merged.append(sample1)
+            sample1 = next(iter1, None)
+            sample2 = next(iter2, None)
+        elif sample1["date"] < sample2["date"]:
+            merged.append(sample1)
+            sample1 = next(iter1, None)
+        else:
+            merged.append(sample2)
+            sample2 = next(iter2, None)
 
-        while True:
-            if sample1["date"] == sample2["date"]:
-                sample1["comptage"] += sample2["comptage"]
-                merged.append(sample1)
-                sample1 = next(iter1)
-                sample2 = next(iter2)
-            elif sample1["date"] < sample2["date"]:
-                merged.append(sample1)
-                sample1 = next(iter1)
-            else:
-                merged.append(sample2)
-                sample2 = next(iter2)
-    except StopIteration:
-        pass
-    # Append any remaining items from either iterator:
+    if sample1 is not None:
+        merged.append(sample1)
+    elif sample2 is not None:
+        merged.append(sample2)
+
     merged.extend(iter1)
     merged.extend(iter2)
     return merged
