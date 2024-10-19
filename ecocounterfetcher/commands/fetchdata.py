@@ -16,53 +16,38 @@ class Columns(EnumWithLowerCaseNames):
     COUNT = auto()
 
 
-class StepSizeAction(argparse.Action):
-    OPTIONS_MAP = {
-        "15min": StepSize.QUARTER_OF_AN_HOUR,
-        "hourly": StepSize.HOUR,
-        "daily": StepSize.DAY,
-        "weekly": StepSize.WEEK,
-        "monthly": StepSize.MONTH
-    }
+STEP_SIZES = {
+    "15min": StepSize.QUARTER_OF_AN_HOUR,
+    "hourly": StepSize.HOUR,
+    "daily": StepSize.DAY,
+    "weekly": StepSize.WEEK,
+    "monthly": StepSize.MONTH
+}
 
-    def __call__(self, parser, namespace, values, option_string=None):
-        setattr(namespace, self.dest, self.OPTIONS_MAP[values])
+DIRECTIONS = {
+    "in": Direction.IN,
+    "out": Direction.OUT,
+    "none": Direction.NONE
+}
 
-
-class DirectionAction(argparse.Action):
-    OPTIONS_MAP = {
-        "in": Direction.IN,
-        "out": Direction.OUT,
-        "none": Direction.NONE
-    }
-
-    def __call__(self, parser, namespace, values, option_string=None):
-        setattr(namespace, self.dest, [self.OPTIONS_MAP[value] for value in values])
-
-
-class MeansOfTransportAction(argparse.Action):
-    OPTIONS_MAP = {
-        "foot": MeansOfTransport.FOOT,
-        "bike": MeansOfTransport.BIKE,
-        "horse": MeansOfTransport.HORSE,
-        "car": MeansOfTransport.CAR,
-        "bus": MeansOfTransport.BUS,
-        "minibus": MeansOfTransport.MINIBUS,
-        "undefined": MeansOfTransport.UNDEFINED,
-        "motorcycle": MeansOfTransport.MOTORCYCLE,
-        "kayak": MeansOfTransport.KAYAK,
-        "e-scooter": MeansOfTransport.E_SCOOTER,
-        "truck": MeansOfTransport.TRUCK
-    }
-
-    def __call__(self, parser, namespace, values, option_string=None):
-        setattr(namespace, self.dest, [self.OPTIONS_MAP[value] for value in values])
-
+MEANS_OF_TRANSPORT = {
+    "foot": MeansOfTransport.FOOT,
+    "bike": MeansOfTransport.BIKE,
+    "horse": MeansOfTransport.HORSE,
+    "car": MeansOfTransport.CAR,
+    "bus": MeansOfTransport.BUS,
+    "minibus": MeansOfTransport.MINIBUS,
+    "undefined": MeansOfTransport.UNDEFINED,
+    "motorcycle": MeansOfTransport.MOTORCYCLE,
+    "kayak": MeansOfTransport.KAYAK,
+    "e-scooter": MeansOfTransport.E_SCOOTER,
+    "truck": MeansOfTransport.TRUCK
+}
 
 def register_argparser(subparsers):
-    fetch_parser = subparsers.add_parser("fetch", help='fetch counts')
-    fetch_parser.set_defaults(func=fetch_counters)
-    group = fetch_parser.add_mutually_exclusive_group(required=True)
+    parser = subparsers.add_parser("fetch", help='fetch counts')
+    parser.set_defaults(func=fetch_data)
+    group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("-d", "--domain",
                        help="id of the domain whose counter sites should be fetched",
                        dest="domain_id",
@@ -72,42 +57,42 @@ def register_argparser(subparsers):
                        dest="site_ids",
                        type=int,
                        nargs="+")
-    fetch_parser.add_argument("-S", "--step-size",
-                              help="step size of the data to fetch",
-                              choices=["15min", "hourly", "daily", "weekly",
-                                       "monthly"],
-                              default=StepSize.HOUR,
-                              dest="step_size",
-                              type=str,
-                              action=StepSizeAction)
-    fetch_parser.add_argument("-f", "--file",
-                              help="file for storing the fetched data. Data is stored as csv. Existing files are overwritten.",
-                              default="-",
-                              dest="file",
-                              type=argparse.FileType('wt', encoding='UTF-8'))
-    fetch_parser.add_argument("-b", "--begin",
-                              help="fetch data starting at date",
-                              dest="begin",
-                              type=str)
-    fetch_parser.add_argument("-e", "--end",
-                              help="fetch data until date",
-                              dest="end",
-                              type=str)
-    fetch_parser.add_argument("-D", "--direction",
-                              help="select directions to fetch",
-                              dest="direction",
-                              type=str,
-                              nargs="+",
-                              action=DirectionAction)
-    fetch_parser.add_argument("-M", "--means-of-transport",
-                              help="select means of transport to fetch",
-                              dest="means_of_transport",
-                              type=str,
-                              nargs="+",
-                              action=MeansOfTransportAction)
+    parser.add_argument("-S", "--step-size",
+                        help="step size of the data to fetch",
+                        choices=STEP_SIZES.values(),
+                        default=StepSize.HOUR,
+                        dest="step_size",
+                        type=STEP_SIZES.get)
+    parser.add_argument("-f", "--file",
+                        help="file for storing the fetched data. Data is stored as csv. Existing files are overwritten.",
+                        default="-",
+                        dest="file",
+                        type=argparse.FileType('wt', encoding='UTF-8'))
+    parser.add_argument("-B", "--begin",
+                        help="fetch data starting at date",
+                        dest="begin",
+                        type=date.fromisoformat)
+    parser.add_argument("-E", "--end",
+                        help="fetch data until date",
+                         dest="end",
+                        type=date.fromisoformat)
+    parser.add_argument("-D", "--direction",
+                        help="select directions to fetch",
+                        choices=DIRECTIONS.values(),
+                        default=list(Direction),
+                        dest="direction",
+                        type=DIRECTIONS.get,
+                        nargs="+")
+    parser.add_argument("-M", "--means-of-transport",
+                        help="select means of transport to fetch",
+                        choices=MEANS_OF_TRANSPORT.values(),
+                        default=list(MeansOfTransport),
+                        dest="means_of_transport",
+                        type=MEANS_OF_TRANSPORT.get,
+                        nargs="+")
 
 
-def fetch_counters(domain_id, site_ids, step_size, file, begin, end, direction, means_of_transport, **kwargs):
+def fetch_data(domain_id, site_ids, step_size, file, begin, end, direction, means_of_transport, **kwargs):
     if domain_id is not None:
         site_ids = _fetch_site_ids_for_domain(domain_id)
 
@@ -130,64 +115,42 @@ def _open_csv(file):
 
 
 def _fetch_all_channels(step_size, site_id, begin, end, direction, means_of_transport):
-    site = apiclient.fetch_site(site_id)
 
-    if begin is None:
-        begin_date = date.fromisoformat(site["date"])
-    else:
-        begin_date = date.fromisoformat(begin)
-    if end is None:
-        end_date = date.today()
-    else:
-        end_date = date.fromisoformat(end)
-    if direction is None:
-        included_directions = [Direction.IN, Direction.OUT]
-    else:
-        included_directions = direction
-    if means_of_transport is None:
-        included_means_of_transport = [
-            MeansOfTransport.FOOT,
-            MeansOfTransport.BIKE,
-            MeansOfTransport.HORSE,
-            MeansOfTransport.CAR,
-            MeansOfTransport.BUS,
-            MeansOfTransport.MINIBUS,
-            MeansOfTransport.UNDEFINED,
-            MeansOfTransport.MOTORCYCLE,
-            MeansOfTransport.KAYAK,
-            MeansOfTransport.E_SCOOTER,
-            MeansOfTransport.TRUCK
-        ]
-    else:
-        included_means_of_transport = means_of_transport
+    site = apiclient.fetch_site(site_id)
 
     domain_id = site["domaine"]
     token = site["token"]
     data = {}
     for channel in site["channels"]:
-        fetch_and_merge_channel(data, channel, domain_id, begin_date, end_date,
-                                step_size, included_directions, included_means_of_transport, token)
+        _fetch_and_merge_channel(data, channel, domain_id, begin, end,
+                                 step_size, direction, means_of_transport,
+                                 token)
     return data
 
 
-def fetch_and_merge_channel(data, channel, domain_id, begin_date, end_date,
-                            step_size, included_directions, included_means_of_transport, token):
+def _fetch_and_merge_channel(data, channel, domain_id, begin, end,
+                            step_size, directions, means_of_transports, token):
+
     direction = Direction(channel["sens"])
     means_of_transport = MeansOfTransport(channel["userType"])
-    if direction not in included_directions:
-        return
-    if means_of_transport not in included_means_of_transport:
-        return
     channel_id = channel["id"]
-    samples = apiclient.fetch_channel(domain_id, channel_id, begin_date,
-                                      end_date, step_size, token)
+
+    if direction not in directions:
+        return
+    if means_of_transport not in means_of_transports:
+        return
+
+    samples = apiclient.fetch_channel(domain_id, channel_id, begin, end,
+                                      step_size, token)
+
     if not (means_of_transport, direction) in data:
         data[(means_of_transport, direction)] = samples
     else:
-        data[means_of_transport, direction] = merge_timeseries(data[means_of_transport, direction], samples)
+        data[means_of_transport, direction] = \
+            _merge_timeseries(data[means_of_transport, direction], samples)
 
 
-def merge_timeseries(data1, data2):
+def _merge_timeseries(data1, data2):
     iter1 = iter(data1)
     iter2 = iter(data2)
     merged = []
