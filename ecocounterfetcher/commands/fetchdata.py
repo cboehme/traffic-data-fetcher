@@ -2,7 +2,6 @@ import argparse
 import csv
 from datetime import date
 from enum import auto
-from nntplib import NNTP_SSL
 
 from ecocounterfetcher import apiclient
 from ecocounterfetcher.apiclient import StepSize, Direction, MeansOfTransport
@@ -17,34 +16,6 @@ class Columns(EnumWithLowerCaseNames):
     COUNT = auto()
 
 
-STEP_SIZES = {
-    "15min": StepSize.QUARTER_OF_AN_HOUR,
-    "hourly": StepSize.HOUR,
-    "daily": StepSize.DAY,
-    "weekly": StepSize.WEEK,
-    "monthly": StepSize.MONTH
-}
-
-DIRECTIONS = {
-    "in": Direction.IN,
-    "out": Direction.OUT,
-    "none": Direction.NONE
-}
-
-MEANS_OF_TRANSPORT = {
-    "foot": MeansOfTransport.FOOT,
-    "bike": MeansOfTransport.BIKE,
-    "horse": MeansOfTransport.HORSE,
-    "car": MeansOfTransport.CAR,
-    "bus": MeansOfTransport.BUS,
-    "minibus": MeansOfTransport.MINIBUS,
-    "undefined": MeansOfTransport.UNDEFINED,
-    "motorcycle": MeansOfTransport.MOTORCYCLE,
-    "kayak": MeansOfTransport.KAYAK,
-    "e-scooter": MeansOfTransport.E_SCOOTER,
-    "truck": MeansOfTransport.TRUCK
-}
-
 def register_argparser(subparsers):
     parser = subparsers.add_parser("fetch", help='fetch counts')
     parser.set_defaults(func=fetch_data)
@@ -58,17 +29,17 @@ def register_argparser(subparsers):
                        dest="site_ids",
                        type=int,
                        nargs="+")
-    parser.add_argument("-S", "--step-size",
-                        help="step size of the data to fetch",
-                        choices=STEP_SIZES.values(),
-                        default=StepSize.HOUR,
-                        dest="step_size",
-                        type=STEP_SIZES.get)
     parser.add_argument("-f", "--file",
                         help="file for storing the fetched data. Data is stored as csv. Existing files are overwritten.",
                         default="-",
                         dest="file",
                         type=argparse.FileType('wt', encoding='UTF-8'))
+    parser.add_argument("-S", "--step-size",
+                        help="step size of the data to fetch",
+                        choices=list(StepSize),
+                        default=StepSize.HOUR,
+                        dest="step_size",
+                        type=StepSize.from_string)
     parser.add_argument("-B", "--begin",
                         help="fetch data starting at date",
                         dest="begin",
@@ -79,17 +50,17 @@ def register_argparser(subparsers):
                         type=date.fromisoformat)
     parser.add_argument("-D", "--direction",
                         help="select directions to fetch",
-                        choices=DIRECTIONS.values(),
+                        choices=list(Direction),
                         default=list(Direction),
                         dest="direction",
-                        type=DIRECTIONS.get,
+                        type=Direction.from_string,
                         nargs="+")
     parser.add_argument("-M", "--means-of-transport",
                         help="select means of transport to fetch",
-                        choices=MEANS_OF_TRANSPORT.values(),
+                        choices=list(MeansOfTransport),
                         default=list(MeansOfTransport),
                         dest="means_of_transport",
-                        type=MEANS_OF_TRANSPORT.get,
+                        type=MeansOfTransport.from_string,
                         nargs="+")
 
 
