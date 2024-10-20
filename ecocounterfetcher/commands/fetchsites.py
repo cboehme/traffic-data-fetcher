@@ -1,5 +1,6 @@
 import argparse
 import csv
+import json
 from enum import auto
 
 from ecocounterfetcher import apiclient
@@ -56,6 +57,8 @@ def _fetch_and_save_sites(file, site_ids):
     csv_file = _open_csv(file)
     for site_id in site_ids:
         site = apiclient.fetch_site(site_id)
+        if site["domaine"] is None:
+            continue
         site_row = _map_site_to_row(site)
         csv_file.writerow(site_row)
 
