@@ -1,5 +1,5 @@
+import json
 from datetime import date
-from logging import NullHandler
 
 import requests
 
@@ -45,7 +45,7 @@ def fetch_sites_in_domain(domain_id: int):
     """
     Retrieves a list of all available counter sites in the given domain.
     """
-    url = f"https://www.eco-visio.net/api/aladdin/1.0.0/pbl/publicwebpageplus/{domain_id}"
+    url = f"https://www.eco-visio.net/api/aladdin/1.0.0/pbl/publicwebpageplus/{domain_id}?withNull=true"
     try:
         response = requests.get(url, headers=HEADERS)
         response.raise_for_status()
