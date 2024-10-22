@@ -77,7 +77,6 @@ def fetch_channel(domain_id: int, channel_id: int, begin: date, end: date, step_
     begin_param = f"&begin={begin.strftime(DATE_FORMAT)}" if begin is not None else ""
     end_param = f"&end={end.strftime(DATE_FORMAT)}" if end is not None else ""
     url = f"https://www.eco-visio.net/api/aladdin/1.0.0/pbl/publicwebpage/data/{channel_id}?step={step_size.value}&domain={domain_id}{begin_param}{end_param}&withNull=true&t={token}"
-    print(url)
     try:
         response = requests.get(url, headers=HEADERS)
         response.raise_for_status()
