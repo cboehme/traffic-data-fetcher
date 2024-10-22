@@ -4,6 +4,7 @@ from enum import auto
 
 from ecocounterfetcher import apiclient
 from ecocounterfetcher.apiclient import MeansOfTransport
+from ecocounterfetcher.utilfunctions import fetch_site_ids_for_domain, open_csv
 from ecocounterfetcher.types import EnumWithLowerCaseNames
 
 
@@ -43,28 +44,16 @@ def register_argparser(subparsers):
 
 def fetch_sites(domain_id, site_ids, file, **kwargs):
     if domain_id is not None:
-        site_ids = _fetch_site_ids_for_domain(domain_id)
+        site_ids = fetch_site_ids_for_domain(domain_id)
     _fetch_and_save_sites(file, site_ids)
 
 
-def _fetch_site_ids_for_domain(domain_id):
-    sites = apiclient.fetch_sites_in_domain(domain_id)
-    return [site["lienPublic"]for site in sites if site["lienPublic"] is not None]
-
-
 def _fetch_and_save_sites(file, site_ids):
-    csv_file = _open_csv(file)
+    csv_file = open_csv(file, Columns)
     for site_id in site_ids:
         site = apiclient.fetch_site(site_id)
         site_row = _map_site_to_row(site)
         csv_file.writerow(site_row)
-
-
-def _open_csv(file):
-    csv_file = csv.DictWriter(file, Columns, restval="",
-                              extrasaction="ignore", dialect="unix")
-    csv_file.writeheader()
-    return csv_file
 
 
 def _map_site_to_row(site):

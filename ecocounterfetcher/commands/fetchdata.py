@@ -1,10 +1,10 @@
 import argparse
-import csv
 from datetime import date
 from enum import auto
 
 from ecocounterfetcher import apiclient
 from ecocounterfetcher.apiclient import StepSize, Direction, MeansOfTransport
+from ecocounterfetcher.utilfunctions import fetch_site_ids_for_domain, open_csv
 from ecocounterfetcher.types import EnumWithLowerCaseNames
 
 
@@ -66,24 +66,12 @@ def register_argparser(subparsers):
 
 def fetch_data(domain_id, site_ids, step_size, file, begin, end, direction, means_of_transport, **kwargs):
     if domain_id is not None:
-        site_ids = _fetch_site_ids_for_domain(domain_id)
+        site_ids = fetch_site_ids_for_domain(domain_id)
 
-    csv_file = _open_csv(file)
+    csv_file = open_csv(file, Columns)
     for site_id in site_ids:
         data = _fetch_all_channels(step_size, site_id, begin, end, direction, means_of_transport)
         _save_data(site_id, data, csv_file)
-
-
-def _fetch_site_ids_for_domain(domain_id):
-    sites = apiclient.fetch_sites_in_domain(domain_id)
-    return [site["idPdc"] for site in sites]
-
-
-def _open_csv(file):
-    csv_file = csv.DictWriter(file, Columns, restval="",
-                              extrasaction="ignore", dialect="unix")
-    csv_file.writeheader()
-    return csv_file
 
 
 def _fetch_all_channels(step_size, site_id, begin, end, direction, means_of_transport):
