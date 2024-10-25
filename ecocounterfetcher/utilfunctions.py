@@ -1,6 +1,14 @@
+import argparse
 import csv
 
 from ecocounterfetcher import apiclient
+
+
+def positive_value(value):
+    int_value = int(value)
+    if int_value <= 0:
+        raise argparse.ArgumentTypeError("%s is an invalid positive int value" % value)
+    return int_value
 
 
 def fetch_site_ids_for_domain(domain_id):

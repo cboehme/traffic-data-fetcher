@@ -48,6 +48,8 @@ def fetch_sites_in_domain(domain_id: int):
     url = f"https://www.eco-visio.net/api/aladdin/1.0.0/pbl/publicwebpageplus/{domain_id}?withNull=true"
     try:
         response = requests.get(url, headers=HEADERS)
+        if response.status_code == 404:
+            return []
         response.raise_for_status()
         return response.json()
     except Exception as e:
