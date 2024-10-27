@@ -41,6 +41,20 @@ class MeansOfTransport(EnumWithLowerCaseNames):
     TRUCK = 14
 
 
+def fetch_domains():
+    """
+    Retrieves a list of all known domains.
+    """
+    url = "https://gist.githubusercontent.com/cboehme/5034712e9e86452d9197998b2837fc76/raw/cfad2357fae1ba409980337edfb78a642dd276ce/domains.json"
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        return response.json()
+    except Exception as e:
+        print(f"An error occurred while fetching domains: {e}")
+        return []
+
+
 def fetch_sites_in_domain(domain_id: int):
     """
     Retrieves a list of all available counter sites in the given domain.
