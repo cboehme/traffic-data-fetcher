@@ -22,6 +22,4 @@ Homepage = "https://github.com/cboehme/eco-counter-fetcher"
 Repository = "https://github.com/cboehme/eco-counter-fetcher.git"
 
 [project.scripts]
-ecf-list-counters = "ecocounterfetcher.fetcher:list_counters"
-ecf-show-info = "ecocounterfetcher.fetcher:show_info"
-ecf-fetch-counter = "ecocounterfetcher.fetcher:fetch_counter"
+ecocounterfetcher = "ecocounterfetcher.fetcher:main"
