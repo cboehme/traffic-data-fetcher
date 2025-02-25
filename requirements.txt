@@ -1,2 +1,2 @@
-setuptools==60.2.0
-requests==2.27.0
+setuptools==70.0.0
+requests==2.32.0

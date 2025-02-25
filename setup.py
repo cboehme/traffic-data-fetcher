@@ -12,7 +12,7 @@ setuptools.setup(
     license='GPL-2',
     packages=setuptools.find_packages(),
     install_requires=[
-        "requests==2.27.0"
+        "requests==2.32.0"
     ],
     entry_points={
         'console_scripts': [
