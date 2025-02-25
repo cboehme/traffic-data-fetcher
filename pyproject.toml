@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ecocounterfetcher"
+version = "1.0.0"
+dependencies = [
+    "requests==2.32.3"
+]
+description = "A command line tool for querying Eco Counter data"
+authors = [
+    { name = "Christoph Böhme", email = "christoph@b3e.net" }
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)"
+]
+
+[project.urls]
+Homepage = "https://github.com/cboehme/eco-counter-fetcher"
+Repository = "https://github.com/cboehme/eco-counter-fetcher.git"
+
+[project.scripts]
+ecf-list-counters = "ecocounterfetcher.fetcher:list_counters"
+ecf-show-info = "ecocounterfetcher.fetcher:show_info"
+ecf-fetch-counter = "ecocounterfetcher.fetcher:fetch_counter"
