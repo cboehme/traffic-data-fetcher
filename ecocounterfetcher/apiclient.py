@@ -44,7 +44,7 @@ def fetch_domains():
     """
     Retrieves a list of all known domains.
     """
-    url = "https://gist.githubusercontent.com/cboehme/5034712e9e86452d9197998b2837fc76/raw/cfad2357fae1ba409980337edfb78a642dd276ce/domains.json"
+    url = "https://gist.githubusercontent.com/cboehme/33d03f2de5add333c0217106cca35478/raw/6083f7519daa693c5e1a538cf7d7dead3533110c/domains.json"
     try:
         response = requests.get(url)
         response.raise_for_status()
