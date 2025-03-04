@@ -8,7 +8,7 @@ version = "1.0.0"
 dependencies = [
     "requests==2.32.3"
 ]
-description = "A command line tool for querying Eco Counter data"
+description = "A command line tool for fetching data from Eco Counters's traffic counter API"
 authors = [
     { name = "Christoph Böhme", email = "christoph@b3e.net" }
 ]
@@ -16,6 +16,9 @@ classifiers = [
     "Development Status :: 5 - Production/Stable",
     "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)"
 ]
+# Not yet supported by setuptools:
+#license = "GPL-3.0-or-later"
+#license-files = ["LICENSE"]
 
 [project.urls]
 Homepage = "https://github.com/cboehme/eco-counter-fetcher"
