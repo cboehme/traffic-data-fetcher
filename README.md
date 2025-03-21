@@ -30,9 +30,9 @@ the `--domain` or `-d` argument.
 
 ### List all domains
 
-Retrieve a list of all known domains.
+List all domains.
 
-Usage: `ecocounterfetcher fetch-domains [-h] [-f FILE]`
+Usage: `ecocounterfetcher list-domains [-h] [-f FILE]`
 
 Options:
  - `-h`, `--help`: show this help message and exit
@@ -42,7 +42,7 @@ Options:
 
 Retrieve detailed information for all counter sites within a specified domain, or from the provided counter sites.
 
-Usage: `ecocounterfetcher fetch-sites [-h] (-d DOMAIN_ID | -s SITE_IDS [SITE_IDS ...]) [-f FILE]`
+Usage: `ecocounterfetcher list-sites [-h] (-d DOMAIN_ID | -s SITE_IDS [SITE_IDS ...]) [-f FILE]`
 
 Options:
  - `-h`, `--help`: show this help message and exit

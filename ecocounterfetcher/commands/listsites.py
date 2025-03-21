@@ -38,8 +38,8 @@ class Columns(EnumWithLowerCaseNames):
 
 
 def register_argparser(subparsers):
-    parser = subparsers.add_parser("fetch-sites", help="fetch site descriptions")
-    parser.set_defaults(func=fetch_sites)
+    parser = subparsers.add_parser("list-sites", help="list counter site descriptions")
+    parser.set_defaults(func=list_sites)
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("-d", "--domain",
                        help="id of the domain whose counter sites should be listed",
@@ -57,7 +57,7 @@ def register_argparser(subparsers):
                         type=argparse.FileType('wt', encoding='UTF-8'))
 
 
-def fetch_sites(domain_id, site_ids, file, **kwargs):
+def list_sites(domain_id, site_ids, file, **kwargs):
     if domain_id is not None:
         site_ids = fetch_site_ids_for_domain(domain_id)
     _fetch_and_save_sites(file, site_ids)

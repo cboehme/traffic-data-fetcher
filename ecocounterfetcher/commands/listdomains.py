@@ -28,8 +28,8 @@ class Columns(EnumWithLowerCaseNames):
 
 
 def register_argparser(subparsers):
-    parser = subparsers.add_parser("fetch-domains", help="Fetch a list of all known domains")
-    parser.set_defaults(func=fetch_domains)
+    parser = subparsers.add_parser("list-domains", help="list all domains")
+    parser.set_defaults(func=list_domains)
     parser.add_argument("-f", "--file",
                         help="store domain list in a csv-file. Existing files are overwritten",
                         default="-",
@@ -37,7 +37,7 @@ def register_argparser(subparsers):
                         type=argparse.FileType('wt', encoding='UTF-8'))
 
 
-def fetch_domains(file, **kwargs):
+def list_domains(file, **kwargs):
     csv_file = open_csv(file, Columns)
     domains = apiclient.fetch_domains()
     for domain in domains:
