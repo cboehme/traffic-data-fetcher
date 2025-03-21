@@ -31,7 +31,7 @@ def register_argparser(subparsers):
     parser = subparsers.add_parser("fetch-domains", help="Fetch a list of all known domains")
     parser.set_defaults(func=fetch_domains)
     parser.add_argument("-f", "--file",
-                        help="file for storing the fetched data. Data is stored as csv. Existing files are overwritten.",
+                        help="store domain list in a csv-file. Existing files are overwritten",
                         default="-",
                         dest="file",
                         type=argparse.FileType('wt', encoding='UTF-8'))

@@ -42,16 +42,16 @@ def register_argparser(subparsers):
     parser.set_defaults(func=fetch_sites)
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("-d", "--domain",
-                       help="id of the domain whose counter sites should be fetched",
+                       help="id of the domain whose counter sites should be listed",
                        dest="domain_id",
                        type=int)
     group.add_argument("-s", "--sites",
-                       help="ids of the counter sites to fetch",
+                       help="ids of the counter sites to list",
                        dest="site_ids",
                        type=int,
                        nargs="+")
     parser.add_argument("-f", "--file",
-                        help="file for storing the fetched data. Data is stored as csv. Existing files are overwritten.",
+                        help="store counter sites in a csv-file. Existing files are overwritten",
                         default="-",
                         dest="file",
                         type=argparse.FileType('wt', encoding='UTF-8'))

@@ -16,7 +16,7 @@
 
 import argparse
 
-from ecocounterfetcher.commands import fetchsites, fetchdata, fetchdomains
+from ecocounterfetcher.commands import fetchsites, fetchcounts, fetchdomains
 
 
 def init_argparse() -> argparse.ArgumentParser:
@@ -25,7 +25,7 @@ def init_argparse() -> argparse.ArgumentParser:
 
     fetchdomains.register_argparser(subparsers)
     fetchsites.register_argparser(subparsers)
-    fetchdata.register_argparser(subparsers)
+    fetchcounts.register_argparser(subparsers)
 
     return parser
 

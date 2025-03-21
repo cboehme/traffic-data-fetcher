@@ -17,7 +17,7 @@
 import unittest
 from unittest import TestCase
 
-from ecocounterfetcher.commands import fetchdata
+from ecocounterfetcher.commands import fetchcounts
 
 
 class FetchDataTest(TestCase):

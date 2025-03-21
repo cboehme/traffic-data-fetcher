@@ -33,7 +33,7 @@ class Columns(EnumWithLowerCaseNames):
 
 
 def register_argparser(subparsers):
-    parser = subparsers.add_parser("fetch", help='fetch counts')
+    parser = subparsers.add_parser("fetch-counts", help='fetch counts')
     parser.set_defaults(func=fetch_data)
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("-d", "--domain",
@@ -46,7 +46,7 @@ def register_argparser(subparsers):
                        type=int,
                        nargs="+")
     parser.add_argument("-f", "--file",
-                        help="file for storing the fetched data. Data is stored as csv. Existing files are overwritten.",
+                        help="store data in a csv-file. Existing files are overwritten",
                         default="-",
                         dest="file",
                         type=argparse.FileType('wt', encoding='UTF-8'))
@@ -57,11 +57,11 @@ def register_argparser(subparsers):
                         dest="step_size",
                         type=StepSize.from_string)
     parser.add_argument("-B", "--begin",
-                        help="fetch data starting at date",
+                        help="fetch data starting at date. Date must be ISO 8610 formatted (YYYY-MM-DD)",
                         dest="begin",
                         type=date.fromisoformat)
     parser.add_argument("-E", "--end",
-                        help="fetch data until date",
+                        help="fetch data until date (exclusively). Date must be ISO 8610 formatted (YYYY-MM-DD)",
                          dest="end",
                         type=date.fromisoformat)
     parser.add_argument("-D", "--direction",
