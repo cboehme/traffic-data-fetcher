@@ -25,10 +25,7 @@ administration.
 
 ## Usage
 
-Eco Counter Fetcher supports three commands:
- - `list-domains`
- - `list-sites`
- - `fetch-counts`
+Eco Counter Fetcher supports the commands `list-domains`, `list-sites`, and `fetch-counts`.
 
 By default, the commands write their results to standard output in csv format. By passing a file name
 with the `-f` or `--file` option the results can be saved into a csv file.
