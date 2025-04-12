@@ -51,7 +51,7 @@ def register_argparser(subparsers):
                         dest="file",
                         type=argparse.FileType('wt', encoding='UTF-8'))
     parser.add_argument("-S", "--step-size",
-                        help="step size of the data to fetch",
+                        help="step size of the data to fetch. Defaults to `hour`",
                         choices=list(StepSize),
                         default=StepSize.HOUR,
                         dest="step_size",
@@ -65,14 +65,14 @@ def register_argparser(subparsers):
                          dest="end",
                         type=date.fromisoformat)
     parser.add_argument("-D", "--direction",
-                        help="select directions to fetch",
+                        help="select directions to fetch. By default, data for all directions is fetched",
                         choices=list(Direction),
                         default=list(Direction),
                         dest="direction",
                         type=Direction.from_string,
                         nargs="+")
     parser.add_argument("-M", "--means-of-transport",
-                        help="select means of transport to fetch",
+                        help="select means of transport to fetch. By default, data for all means of transport is fetched",
                         choices=list(MeansOfTransport),
                         default=list(MeansOfTransport),
                         dest="means_of_transport",

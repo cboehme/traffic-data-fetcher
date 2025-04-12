@@ -78,10 +78,16 @@ Options:
  - `-d`, `--domain` `DOMAIN_ID`: id of the domain whose counter sites should be fetched
  - `-s`, `--sites` `SITE_IDS [SITE_IDS ...]`: ids of the counter sites to fetch
  - `-f`, `--file` `FILE`: store data in a csv-file. Existing files are overwritten
- - `-S`, `--step-size {quarter_of_an_hour,hour,day,week,month}`: step size of the data to fetch
+ - `-S`, `--step-size {quarter_of_an_hour,hour,day,week,month}`: step size of the data to fetch. Defaults to `hour`
  - `-B`, `--begin BEGIN`: fetch data starting at date. Date must be ISO 8610 formatted (YYYY-MM-DD)
  - `-E`, `--end END`: fetch data until date (exclusively). Date must be ISO 8610 formatted (YYYY-MM-DD)
- - `-D`, `--direction {in,out,none} [{in,out,none} ...]`: select directions to fetch
- - `-M`, `--means-of-transport {foot,bike,horse,car,bus,minibus,undefined,motorcycle,kayak,e_scooter,truck} [{foot,bike,horse,car,bus,minibus,undefined,motorcycle,kayak,e_scooter,truck} ...]`: select means of transport to fetch
+ - `-D`, `--direction {in,out,none} [{in,out,none} ...]`: select directions to fetch. By default, data for all directions is fetched
+ - `-M`, `--means-of-transport {foot,bike,horse,car,bus,minibus,undefined,motorcycle,kayak,e_scooter,truck} [{foot,bike,horse,car,bus,minibus,undefined,motorcycle,kayak,e_scooter,truck} ...]`: select means of transport to fetch. By default, data for all means of transport is fetched
 
 ## Examples
+
+- List domains
+- List counter sites per domain
+- Fetch counter by counter site-ids
+- Filter by direction and means of tranport
+- Restrict timerange
