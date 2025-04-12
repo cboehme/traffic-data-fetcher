@@ -54,8 +54,8 @@ Usage: `ecocounterfetcher list-sites [-h] (-d DOMAIN_ID | -s SITE_IDS [SITE_IDS 
 
 Options:
  - `-h`, `--help`: show this help message and exit
- - `-d`, `--domain` `DOMAIN_ID`: id of the domain whose counter sites should be fetched
- - `-s`, `--sites` `SITE_IDS [SITE_IDS ...]`: ids of the counter sites to fetch
+ - `-d`, `--domain` `DOMAIN_ID`: id of the domain whose counter sites should be listed
+ - `-s`, `--sites` `SITE_IDS [SITE_IDS ...]`: ids of the counter sites to list
  - `-f`, `--file` `FILE`: store counter sites in a csv-file. Existing files are overwritten
 
 ### Fetch counter data
