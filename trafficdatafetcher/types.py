@@ -1,4 +1,4 @@
-# Eco Counter Fetcher - Fetch data from Eco Counter's traffic counter API
+# Traffic Data Fetcher - Fetch data from Eco Counter's traffic counter API
 # Copyright (C) 2025  Christoph Böhne
 #
 # This program is free software: you can redistribute it and/or modify
@@ -14,6 +14,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-if __name__ == "__main__":
-    from ecocounterfetcher.fetcher import main
-    main()
+from enum import Enum
+
+
+class EnumWithLowerCaseNames(Enum):
+    def __str__(self):
+        return self.name.lower()
+
+    @classmethod
+    def from_string(cls, value: str):
+        try:
+            return cls[value.upper()]
+        except KeyError:
+            raise ValueError(f"{value} is not a valid {cls.__name__}")

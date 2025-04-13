@@ -1,16 +1,16 @@
-# Eco Counter Fetcher
+# Traffic Data Fetcher
 
 A command line tool for retrieving information about counter sites and fetching 
 traffic data from [Eco Counter's](https://www.eco-counter.com/) traffic monitoring stations.
 
 ## Installation
 
-Eco Counter Fetcher requires Python 3.8 or higher. 
-The recommended way to install Eco Counter Fetcher is via [pipx](https://pipx.pypa.io/):
+Traffic Data Fetcher requires Python 3.8 or higher. 
+The recommended way to install Traffic Data Fetcher is via [pipx](https://pipx.pypa.io/):
 ```shell
-python3 -m pipx install ecocounterfetcher
+python3 -m pipx install trafficdatafetcher
 ```
-Alternatively, pipx allows to directly run Eco Counter Fetcher without installing it first:
+Alternatively, pipx allows to directly run Traffic Data Fetcher without installing it first:
 ```shell
 python3 -m pipx run ecoounterfetcher YOUR-ARGS-HERE
 ```
@@ -25,7 +25,7 @@ administration.
 
 ## Usage
 
-Eco Counter Fetcher supports the commands `list-domains`, `list-sites`, and `fetch-counts`.
+Traffic Data Fetcher supports the commands `list-domains`, `list-sites`, and `fetch-counts`.
 
 By default, the commands write their results to standard output in csv format. By passing a file name
 with the `-f` or `--file` option the results can be saved into a csv file.
@@ -36,7 +36,7 @@ Retrieves a list of all known domains. As there is no official queryable list of
 `list-domains` command relies on a list which is regularly updated by a cloud service that checks 
 all domain ids between 1 and 10.000 for existing domains.
 
-Usage: `ecocounterfetcher list-domains [-h] [-f FILE]`
+Usage: `trafficdatafetcher list-domains [-h] [-f FILE]`
 
 Options:
  - `-h`, `--help`: show this help message and exit
@@ -47,7 +47,7 @@ Options:
 Retrieves detailed information for all *public* counter sites within a specified domain, or for the 
 provided counter sites.
 
-Usage: `ecocounterfetcher list-sites [-h] (-d DOMAIN_ID | -s SITE_IDS [SITE_IDS ...]) [-f FILE]`
+Usage: `trafficdatafetcher list-sites [-h] (-d DOMAIN_ID | -s SITE_IDS [SITE_IDS ...]) [-f FILE]`
 
 Options:
  - `-h`, `--help`: show this help message and exit
@@ -63,7 +63,7 @@ resolution.
 
 Usage: 
 ```
-ecocounterfetcher fetch-counts [-h] (-d DOMAIN_ID | -s SITE_IDS [SITE_IDS ...]) 
+trafficdatafetcher fetch-counts [-h] (-d DOMAIN_ID | -s SITE_IDS [SITE_IDS ...]) 
                                [-f FILE] 
                                [-S {quarter_of_an_hour,hour,day,week,month}]
                                [-B BEGIN] [-E END] 
@@ -88,28 +88,28 @@ Options:
 
 - Show the list of known domains:
   ```shell
-  ecocounterfetcher list-domains
+  trafficdatafetcher list-domains
   ```
 - Show details for all counter sites in the domain *Stadt Bonn*:
   ```shell
-  ecocounterfetcher list-sites --domain 4701
+  trafficdatafetcher list-sites --domain 4701
   ```
 - Fetch the monthly counts from all counters at the two counter sites *Kennedybrücke (Nordseite)* and 
   *Kennedybrücke (Südseite)* in Bonn:
   ```shell
-  ecocounterfetcher fetch-counts --sites 100019809,100019810 --step-size month
+  trafficdatafetcher fetch-counts --sites 100019809,100019810 --step-size month
   ```
 - Fetch the monthly counts for cars driving into town at Bismarckstraße in Ludwigsburg (the counter 
   sites has counters for bikes and cars):
   ```shell
   # Get the details of the counter site to find out 
   # which direction corresponds to going into town:
-  ecocounterfetcher list-sites --sites 300015617
+  trafficdatafetcher list-sites --sites 300015617
   # Going into town is represented by direction in (unsurprisingly).
   # Using this information the data can be fetched:
-  ecocounterfetcher fetch-counts --sites 300015617 --step-size month --direction IN --means-of-transport car
+  trafficdatafetcher fetch-counts --sites 300015617 --step-size month --direction IN --means-of-transport car
   ```
 - Fetch counts per hour collected at the counter site *Rhenusallee* in Bonn for Saturday, 5th of April 2025, and Sunday, 6th of April 2025:
   ```shell
-  ecocounterfetcher fetch-counts --sites 100019729 --begin 2025-04-05 --end 2025-04-07
+  trafficdatafetcher fetch-counts --sites 100019729 --begin 2025-04-05 --end 2025-04-07
   ```

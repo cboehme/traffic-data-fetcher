@@ -1,4 +1,4 @@
-# Eco Counter Fetcher - Fetch data from Eco Counter's traffic counter API
+# Traffic Data Fetcher - Fetch data from Eco Counter's traffic counter API
 # Copyright (C) 2025  Christoph Böhne
 #
 # This program is free software: you can redistribute it and/or modify
@@ -13,3 +13,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+if __name__ == "__main__":
+    from trafficdatafetcher.fetcher import main
+    main()

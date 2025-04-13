@@ -1,4 +1,4 @@
-# Eco Counter Fetcher - Fetch data from Eco Counter's traffic counter API
+# Traffic Data Fetcher - Fetch data from Eco Counter's traffic counter API
 # Copyright (C) 2025  Christoph Böhne
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,10 +17,10 @@
 import argparse
 from enum import auto
 
-from ecocounterfetcher import apiclient
-from ecocounterfetcher.apiclient import MeansOfTransport
-from ecocounterfetcher.utilfunctions import fetch_site_ids_for_domain, open_csv
-from ecocounterfetcher.types import EnumWithLowerCaseNames
+from trafficdatafetcher import apiclient
+from trafficdatafetcher.apiclient import MeansOfTransport
+from trafficdatafetcher.utilfunctions import fetch_site_ids_for_domain, open_csv
+from trafficdatafetcher.types import EnumWithLowerCaseNames
 
 
 class Columns(EnumWithLowerCaseNames):

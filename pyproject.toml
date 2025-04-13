@@ -1,4 +1,4 @@
-# Eco Counter Fetcher - Fetch data from Eco Counter's traffic counter API
+# Traffic Data Fetcher - Fetch data from Eco Counter's traffic counter API
 # Copyright (C) 2025  Christoph Böhne
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ecocounterfetcher"
+name = "trafficdatafetcher"
 version = "1.0.0"
 dependencies = [
     "requests==2.32.3"
@@ -49,4 +49,4 @@ Repository = "https://github.com/cboehme/eco-counter-fetcher.git"
 Issues = "https://github.com/cboehme/eco-counter-fetcher/issues"
 
 [project.scripts]
-ecocounterfetcher = "ecocounterfetcher.fetcher:main"
+trafficdatafetcher = "trafficdatafetcher.fetcher:main"

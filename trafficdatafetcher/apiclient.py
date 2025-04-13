@@ -1,4 +1,4 @@
-# Eco Counter Fetcher - Fetch data from Eco Counter's traffic counter API
+# Traffic Data Fetcher - Fetch data from Eco Counter's traffic counter API
 # Copyright (C) 2025  Christoph Böhne
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@ from datetime import date
 
 import requests
 
-from ecocounterfetcher.types import EnumWithLowerCaseNames
+from trafficdatafetcher.types import EnumWithLowerCaseNames
 
 # Faking headers is only for "obscurity":
 HEADERS = {

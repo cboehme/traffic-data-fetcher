@@ -1,4 +1,4 @@
-# Eco Counter Fetcher - Fetch data from Eco Counter's traffic counter API
+# Traffic Data Fetcher - Fetch data from Eco Counter's traffic counter API
 # Copyright (C) 2025  Christoph Böhne
 #
 # This program is free software: you can redistribute it and/or modify
@@ -14,16 +14,26 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from enum import Enum
+import argparse
+
+from trafficdatafetcher.commands import listsites, fetchcounts, listdomains
 
 
-class EnumWithLowerCaseNames(Enum):
-    def __str__(self):
-        return self.name.lower()
+def init_argparse() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers(required=True)
 
-    @classmethod
-    def from_string(cls, value: str):
-        try:
-            return cls[value.upper()]
-        except KeyError:
-            raise ValueError(f"{value} is not a valid {cls.__name__}")
+    listdomains.register_argparser(subparsers)
+    listsites.register_argparser(subparsers)
+    fetchcounts.register_argparser(subparsers)
+
+    return parser
+
+def main():
+    args = init_argparse().parse_args()
+    if hasattr(args, "func"):
+        args.func(**vars(args))
+
+
+if __name__ == "__main__":
+    main()

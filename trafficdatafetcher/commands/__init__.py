@@ -1,4 +1,4 @@
-# Eco Counter Fetcher - Fetch data from Eco Counter's traffic counter API
+# Traffic Data Fetcher - Fetch data from Eco Counter's traffic counter API
 # Copyright (C) 2025  Christoph Böhne
 #
 # This program is free software: you can redistribute it and/or modify
@@ -13,27 +13,3 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-import argparse
-
-from ecocounterfetcher.commands import listsites, fetchcounts, listdomains
-
-
-def init_argparse() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser()
-    subparsers = parser.add_subparsers(required=True)
-
-    listdomains.register_argparser(subparsers)
-    listsites.register_argparser(subparsers)
-    fetchcounts.register_argparser(subparsers)
-
-    return parser
-
-def main():
-    args = init_argparse().parse_args()
-    if hasattr(args, "func"):
-        args.func(**vars(args))
-
-
-if __name__ == "__main__":
-    main()

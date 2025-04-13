@@ -1,4 +1,4 @@
-# Eco Counter Fetcher - Fetch data from Eco Counter's traffic counter API
+# Traffic Data Fetcher - Fetch data from Eco Counter's traffic counter API
 # Copyright (C) 2025  Christoph Böhne
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 import argparse
 import csv
 
-from ecocounterfetcher import apiclient
+from trafficdatafetcher import apiclient
 
 
 def positive_value(value):
