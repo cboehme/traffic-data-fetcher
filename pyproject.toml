@@ -15,12 +15,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=61.0", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "trafficdatafetcher"
-version = "1.0.0"
+dynamic = ["version"]
 dependencies = [
     "requests==2.32.3"
 ]
@@ -57,3 +57,6 @@ Issues = "https://github.com/cboehme/traffic-data-fetcher/issues"
 
 [project.scripts]
 trafficdatafetcher = "trafficdatafetcher.fetcher:main"
+
+[tool.setuptools_scm]
+tag_regex = "^release/(?P<version>\\d+\\.\\d+.\\d+)$"
