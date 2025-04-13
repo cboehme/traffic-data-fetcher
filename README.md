@@ -86,8 +86,30 @@ Options:
 
 ## Examples
 
-- List domains
-- List counter sites per domain
-- Fetch counter by counter site-ids
-- Filter by direction and means of tranport
-- Restrict timerange
+- Show the list of known domains:
+  ```shell
+  ecocounterfetcher list-domains
+  ```
+- Show details for all counter sites in the domain *Stadt Bonn*:
+  ```shell
+  ecocounterfetcher list-sites --domain 4701
+  ```
+- Fetch the monthly counts from all counters at the two counter sites *Kennedybrücke (Nordseite)* and 
+  *Kennedybrücke (Südseite)* in Bonn:
+  ```shell
+  ecocounterfetcher fetch-counts --sites 100019809,100019810 --step-size month
+  ```
+- Fetch the monthly counts for cars driving into town at Bismarckstraße in Ludwigsburg (the counter 
+  sites has counters for bikes and cars):
+  ```shell
+  # Get the details of the counter site to find out 
+  # which direction corresponds to going into town:
+  ecocounterfetcher list-sites --sites 300015617
+  # Going into town is represented by direction in (unsurprisingly).
+  # Using this information the data can be fetched:
+  ecocounterfetcher fetch-counts --sites 300015617 --step-size month --direction IN --means-of-transport car
+  ```
+- Fetch counts per hour collected at the counter site *Rhenusallee* in Bonn for Saturday, 5th of April 2025, and Sunday, 6th of April 2025:
+  ```shell
+  ecocounterfetcher fetch-counts --sites 100019729 --begin 2025-04-05 --end 2025-04-07
+  ```
