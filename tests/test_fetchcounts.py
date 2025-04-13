@@ -20,7 +20,7 @@ from unittest import TestCase
 from ecocounterfetcher.commands import fetchcounts
 
 
-class FetchDataTest(TestCase):
+class FetchCountsTest(TestCase):
     def test_two_same_length_arrays_with_matching_values_should_merge(self):
         data1 = [
             {"date": "2024-01-01 01:00:00", "comptage": 1},
@@ -34,7 +34,7 @@ class FetchDataTest(TestCase):
             {"date": "2024-01-01 03:00:00", "comptage": 200},
             {"date": "2024-01-01 04:00:00", "comptage": 2000}
         ]
-        merged = fetchdata._merge_timeseries(data1, data2)
+        merged = fetchcounts._merge_timeseries(data1, data2)
         self.assertEqual(merged, [
             {"date": "2024-01-01 01:00:00", "comptage": 3},
             {"date": "2024-01-01 02:00:00", "comptage": 30},
@@ -55,7 +55,7 @@ class FetchDataTest(TestCase):
             {"date": "2024-01-01 10:00:00", "comptage": 200},
             {"date": "2024-01-01 11:00:00", "comptage": 2000}
         ]
-        merged = fetchdata._merge_timeseries(data1, data2)
+        merged = fetchcounts._merge_timeseries(data1, data2)
         self.assertEqual(merged, [
             {"date": "2024-01-01 01:00:00", "comptage": 1},
             {"date": "2024-01-01 02:00:00", "comptage": 10},
@@ -79,7 +79,7 @@ class FetchDataTest(TestCase):
             {"date": "2024-01-01 03:00:00", "comptage": 200},
             {"date": "2024-01-01 04:00:00", "comptage": 2000}
         ]
-        merged = fetchdata._merge_timeseries(data1, data2)
+        merged = fetchcounts._merge_timeseries(data1, data2)
         self.assertEqual(merged, [
             {"date": "2024-01-01 01:00:00", "comptage": 2},
             {"date": "2024-01-01 02:00:00", "comptage": 20},
@@ -103,7 +103,7 @@ class FetchDataTest(TestCase):
             {"date": "2024-01-01 06:00:00", "comptage": 200},
             {"date": "2024-01-01 08:00:00", "comptage": 2000}
         ]
-        merged = fetchdata._merge_timeseries(data1, data2)
+        merged = fetchcounts._merge_timeseries(data1, data2)
         self.assertEqual(merged, [
             {"date": "2024-01-01 01:00:00", "comptage": 1},
             {"date": "2024-01-01 02:00:00", "comptage": 2},
@@ -125,7 +125,7 @@ class FetchDataTest(TestCase):
             {"date": "2024-01-01 02:00:00", "comptage": 20},
             {"date": "2024-01-01 03:00:00", "comptage": 200}
         ]
-        merged = fetchdata._merge_timeseries(data1, data2)
+        merged = fetchcounts._merge_timeseries(data1, data2)
         self.assertEqual(merged, [
             {"date": "2024-01-01 01:00:00", "comptage": 1},
             {"date": "2024-01-01 02:00:00", "comptage": 30},
@@ -143,7 +143,7 @@ class FetchDataTest(TestCase):
             {"date": "2024-01-01 03:00:00", "comptage": 100},
             {"date": "2024-01-01 04:00:00", "comptage": 1000}
         ]
-        merged = fetchdata._merge_timeseries(data1, data2)
+        merged = fetchcounts._merge_timeseries(data1, data2)
         self.assertEqual(merged, [
             {"date": "2024-01-01 01:00:00", "comptage": 1},
             {"date": "2024-01-01 02:00:00", "comptage": 30},
@@ -164,7 +164,7 @@ class FetchDataTest(TestCase):
             {"date": "2024-01-01 05:00:00", "comptage": 200},
             {"date": "2024-01-01 06:00:00", "comptage": 2000}
         ]
-        merged = fetchdata._merge_timeseries(data1, data2)
+        merged = fetchcounts._merge_timeseries(data1, data2)
         self.assertEqual(merged, [
             {"date": "2024-01-01 01:00:00", "comptage": 1},
             {"date": "2024-01-01 02:00:00", "comptage": 10},
@@ -181,7 +181,7 @@ class FetchDataTest(TestCase):
             {"date": "2024-01-01 04:00:00", "comptage": 1000}
         ]
         data2 = []
-        merged = fetchdata._merge_timeseries(data1, data2)
+        merged = fetchcounts._merge_timeseries(data1, data2)
         self.assertEqual(merged, [
             {"date": "2024-01-01 01:00:00", "comptage": 1},
             {"date": "2024-01-01 02:00:00", "comptage": 10},
@@ -197,7 +197,7 @@ class FetchDataTest(TestCase):
             {"date": "2024-01-01 03:00:00", "comptage": 100},
             {"date": "2024-01-01 04:00:00", "comptage": 1000}
         ]
-        merged = fetchdata._merge_timeseries(data1, data2)
+        merged = fetchcounts._merge_timeseries(data1, data2)
         self.assertEqual(merged, [
             {"date": "2024-01-01 01:00:00", "comptage": 1},
             {"date": "2024-01-01 02:00:00", "comptage": 10},
@@ -208,7 +208,7 @@ class FetchDataTest(TestCase):
     def test_return_empty_array_if_both_are_empty(self):
         data1 = []
         date2 = []
-        merged = fetchdata._merge_timeseries(data1, date2)
+        merged = fetchcounts._merge_timeseries(data1, date2)
         self.assertEqual(merged, [])
 
 
