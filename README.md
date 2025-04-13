@@ -14,6 +14,7 @@ Alternatively, pipx allows to directly run Traffic Data Fetcher without installi
 ```shell
 python3 -m pipx run ecoounterfetcher YOUR-ARGS-HERE
 ```
+
 ## Organisation of the traffic monitoring stations
 
 Eco Counter calls their traffic monitoring stations counter sites. 
@@ -94,22 +95,23 @@ Options:
   ```shell
   trafficdatafetcher list-sites --domain 4701
   ```
-- Fetch the monthly counts from all counters at the two counter sites *Kennedybrücke (Nordseite)* and 
-  *Kennedybrücke (Südseite)* in Bonn:
+`- Retrieve the monthly count data for all counters at the two counter sites *Kennedybrücke (Nordseite)* and 
+  *Kennedybrücke (Südseite)* in Bonn:`
   ```shell
   trafficdatafetcher fetch-counts --sites 100019809,100019810 --step-size month
   ```
-- Fetch the monthly counts for cars driving into town at Bismarckstraße in Ludwigsburg (the counter 
-  sites has counters for bikes and cars):
+- Retrieve the monthly count data for cars entering Ludwigsburg via Bismarckstraße (the counter 
+  site records counts for both bicycles and cars):
   ```shell
   # Get the details of the counter site to find out 
   # which direction corresponds to going into town:
   trafficdatafetcher list-sites --sites 300015617
   # Going into town is represented by direction in (unsurprisingly).
-  # Using this information the data can be fetched:
+  # Using this information the data can be fetched like this:
   trafficdatafetcher fetch-counts --sites 300015617 --step-size month --direction IN --means-of-transport car
   ```
-- Fetch counts per hour collected at the counter site *Rhenusallee* in Bonn for Saturday, 5th of April 2025, and Sunday, 6th of April 2025:
+- Retrieve hourly count data per recorded at the counter site *Rhenusallee* in Bonn for the dates Saturday, April 5, 2025, 
+  and Sunday, April 6, 2025:
   ```shell
   trafficdatafetcher fetch-counts --sites 100019729 --begin 2025-04-05 --end 2025-04-07
   ```
