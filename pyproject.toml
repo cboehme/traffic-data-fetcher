@@ -38,7 +38,14 @@ classifiers = [
     "Topic :: Scientific/Engineering :: GIS",
 
 ]
-keywords = ["eco counter", "bicycle", "pedestrian", "counting", "traffic"]
+keywords = [
+    "eco-counter",
+    "bikes",
+    "pedestrian",
+    "data-collection",
+    "traffic-data",
+    "traffic-monitoring"
+]
 # Not yet supported by setuptools:
 #license = "GPL-3.0-or-later"
 #license-files = ["LICENSE"]
