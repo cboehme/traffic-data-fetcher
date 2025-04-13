@@ -1,6 +1,6 @@
 # Traffic Data Fetcher
 
-A command line tool for retrieving information about counter sites and fetching 
+A command line tool for retrieving information about counter sites and retrieving 
 traffic data from [Eco Counter's](https://www.eco-counter.com/) traffic monitoring stations.
 
 ## Installation

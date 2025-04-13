@@ -1,4 +1,4 @@
-# Traffic Data Fetcher - Fetch data from Eco Counter's traffic counter API
+# Traffic Data Fetcher - Retrieve data from Eco Counter's traffic counter API
 # Copyright (C) 2025  Christoph Böhne
 #
 # This program is free software: you can redistribute it and/or modify
@@ -25,7 +25,7 @@ dependencies = [
     "requests==2.32.3"
 ]
 requires-python = ">=3.8"
-description = "A command line tool for fetching data from Eco Counter's traffic counter API"
+description = "A command line tool for retrieving data from Eco Counter's traffic counter API"
 readme = "README.md"
 authors = [
     { name = "Christoph Böhme", email = "christoph@b3e.net" }
