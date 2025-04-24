@@ -31,6 +31,10 @@ Traffic Data Fetcher supports the commands `list-domains`, `list-sites`, and `fe
 By default, the commands write their results to standard output in csv format. By passing a file name
 with the `-f` or `--file` option the results can be saved into a csv file.
 
+Standard options:
+ - `-h`, `--help`: show a help message and exit
+ - `--version`: show the version of traffic-data-fetcher and exit
+
 ### List all domains
 
 Retrieves a list of all known domains. As there is no official queryable list of domains, the 
@@ -40,7 +44,7 @@ all domain ids between 1 and 10.000 for existing domains.
 Usage: `traffic-data-fetcher list-domains [-h] [-f FILE]`
 
 Options:
- - `-h`, `--help`: show this help message and exit
+ - `-h`, `--help`: show a help message and exit
  - `-f`, `--file` `FILE`: store a domain list in a csv-file. Existing files are overwritten
 
 ### List counter sites
@@ -51,7 +55,7 @@ provided counter sites.
 Usage: `traffic-data-fetcher list-sites [-h] (-d DOMAIN_ID | -s SITE_IDS [SITE_IDS ...]) [-f FILE]`
 
 Options:
- - `-h`, `--help`: show this help message and exit
+ - `-h`, `--help`: show a help message and exit
  - `-d`, `--domain` `DOMAIN_ID`: id of the domain whose counter sites should be listed
  - `-s`, `--sites` `SITE_IDS [SITE_IDS ...]`: ids of the counter sites to list
  - `-f`, `--file` `FILE`: store counter sites in a csv-file. Existing files are overwritten
@@ -75,7 +79,7 @@ traffic-data-fetcher fetch-counts [-h] (-d DOMAIN_ID | -s SITE_IDS [SITE_IDS ...
 ```
 
 Options:
- - `-h`, `--help`: show this help message and exit
+ - `-h`, `--help`: show a help message and exit
  - `-d`, `--domain` `DOMAIN_ID`: id of the domain whose counter sites should be fetched
  - `-s`, `--sites` `SITE_IDS [SITE_IDS ...]`: ids of the counter sites to fetch
  - `-f`, `--file` `FILE`: store data in a csv-file. Existing files are overwritten
