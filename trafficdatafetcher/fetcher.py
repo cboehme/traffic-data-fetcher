@@ -15,12 +15,21 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import argparse
+from importlib.metadata import PackageNotFoundError, version
 
 from trafficdatafetcher.commands import listsites, fetchcounts, listdomains
 
 
+def get_version() -> str:
+    try:
+        return version("traffic-data-fetcher")
+    except PackageNotFoundError:
+        return "unknown"
+
 def init_argparse() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser()
+    parser.add_argument('--version', action='version',
+                        version=f'%(prog)s {get_version()}')
     subparsers = parser.add_subparsers(required=True)
 
     listdomains.register_argparser(subparsers)
