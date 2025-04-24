@@ -8,19 +8,19 @@ traffic data from [Eco Counter's](https://www.eco-counter.com/) traffic monitori
 Traffic Data Fetcher requires Python 3.8 or higher. 
 The recommended way to install Traffic Data Fetcher is via [pipx](https://pipx.pypa.io/):
 ```shell
-python3 -m pipx install trafficdatafetcher
+python3 -m pipx install traffic-data-fetcher
 ```
-Alternatively, pipx allows to directly run Traffic Data Fetcher without installing it first:
+Alternatively, pipx allows directly running Traffic Data Fetcher without installing it first:
 ```shell
-python3 -m pipx run ecoounterfetcher YOUR-ARGS-HERE
+python3 -m pipx run traffic-data-fetcher YOUR-ARGS-HERE
 ```
 
 ## Organisation of the traffic monitoring stations
 
 Eco Counter calls their traffic monitoring stations counter sites. 
-A **counter site** groups counters positioned at the same location. 
+A **counter-site** groups counters positioned at the same location. 
 A **counter** collects data for a specific means of transport and a specific direction of travel.
-Each counter site belongs to a domain.
+Each counter-site belongs to a domain.
 A **domain** groups a number of counter sites which are typically operated by a city or district 
 administration.
 
@@ -37,18 +37,18 @@ Retrieves a list of all known domains. As there is no official queryable list of
 `list-domains` command relies on a list which is regularly updated by a cloud service that checks 
 all domain ids between 1 and 10.000 for existing domains.
 
-Usage: `trafficdatafetcher list-domains [-h] [-f FILE]`
+Usage: `traffic-data-fetcher list-domains [-h] [-f FILE]`
 
 Options:
  - `-h`, `--help`: show this help message and exit
- - `-f`, `--file` `FILE`: store domain list in a csv-file. Existing files are overwritten
+ - `-f`, `--file` `FILE`: store a domain list in a csv-file. Existing files are overwritten
 
 ### List counter sites
 
 Retrieves detailed information for all *public* counter sites within a specified domain, or for the 
 provided counter sites.
 
-Usage: `trafficdatafetcher list-sites [-h] (-d DOMAIN_ID | -s SITE_IDS [SITE_IDS ...]) [-f FILE]`
+Usage: `traffic-data-fetcher list-sites [-h] (-d DOMAIN_ID | -s SITE_IDS [SITE_IDS ...]) [-f FILE]`
 
 Options:
  - `-h`, `--help`: show this help message and exit
@@ -58,20 +58,20 @@ Options:
 
 ### Fetch counter data
 
-Retrieves traffic data from all counter sites within a specified domain, or from the provided counter sites. 
+Retrieves traffic data from all counter sites within a specified domain or from the provided counter sites. 
 The returned data can be filtered by means of transport and direction, and constrained by time range and temporal 
 resolution.
 
 Usage: 
 ```
-trafficdatafetcher fetch-counts [-h] (-d DOMAIN_ID | -s SITE_IDS [SITE_IDS ...]) 
-                               [-f FILE] 
-                               [-S {quarter_of_an_hour,hour,day,week,month}]
-                               [-B BEGIN] [-E END] 
-                               [-D {in,out,none} [{in,out,none} ...]]
-                               [-M {foot,bike,horse,car,bus,minibus,undefined,motorcycle,kayak,e_scooter,truck} 
-                                  [{foot,bike,horse,car,bus,minibus,undefined,motorcycle,kayak,e_scooter,truck} 
-                                  ...]]`
+traffic-data-fetcher fetch-counts [-h] (-d DOMAIN_ID | -s SITE_IDS [SITE_IDS ...]) 
+                                  [-f FILE] 
+                                  [-S {quarter_of_an_hour,hour,day,week,month}]
+                                  [-B BEGIN] [-E END] 
+                                  [-D {in,out,none} [{in,out,none} ...]]
+                                  [-M {foot,bike,horse,car,bus,minibus,undefined,motorcycle,kayak,e_scooter,truck} 
+                                      [{foot,bike,horse,car,bus,minibus,undefined,motorcycle,kayak,e_scooter,truck} 
+                                      ...]]`
 ```
 
 Options:
@@ -89,29 +89,29 @@ Options:
 
 - Show the list of known domains:
   ```shell
-  trafficdatafetcher list-domains
+  traffic-data-fetcher list-domains
   ```
 - Show details for all counter sites in the domain *Stadt Bonn*:
   ```shell
-  trafficdatafetcher list-sites --domain 4701
+  traffic-data-fetcher list-sites --domain 4701
   ```
 `- Retrieve the monthly count data for all counters at the two counter sites *Kennedybrücke (Nordseite)* and 
   *Kennedybrücke (Südseite)* in Bonn:`
   ```shell
-  trafficdatafetcher fetch-counts --sites 100019809,100019810 --step-size month
+  traffic-data-fetcher fetch-counts --sites 100019809,100019810 --step-size month
   ```
 - Retrieve the monthly count data for cars entering Ludwigsburg via Bismarckstraße (the counter 
   site records counts for both bicycles and cars):
   ```shell
   # Get the details of the counter site to find out 
   # which direction corresponds to going into town:
-  trafficdatafetcher list-sites --sites 300015617
+  traffic-data-fetcher list-sites --sites 300015617
   # Going into town is represented by direction in (unsurprisingly).
   # Using this information the data can be fetched like this:
-  trafficdatafetcher fetch-counts --sites 300015617 --step-size month --direction IN --means-of-transport car
+  traffic-data-fetcher fetch-counts --sites 300015617 --step-size month --direction IN --means-of-transport car
   ```
 - Retrieve hourly count data per recorded at the counter site *Rhenusallee* in Bonn for the dates Saturday, April 5, 2025, 
   and Sunday, April 6, 2025:
   ```shell
-  trafficdatafetcher fetch-counts --sites 100019729 --begin 2025-04-05 --end 2025-04-07
+  traffic-data-fetcher fetch-counts --sites 100019729 --begin 2025-04-05 --end 2025-04-07
   ```

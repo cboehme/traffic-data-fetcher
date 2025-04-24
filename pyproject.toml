@@ -56,7 +56,7 @@ Repository = "https://github.com/cboehme/traffic-data-fetcher.git"
 Issues = "https://github.com/cboehme/traffic-data-fetcher/issues"
 
 [project.scripts]
-trafficdatafetcher = "trafficdatafetcher.fetcher:main"
+traffic-data-fetcher = "trafficdatafetcher.fetcher:main"
 
 [tool.setuptools_scm]
 tag_regex = "^release/(?P<version>\\d+\\.\\d+.\\d+)$"
