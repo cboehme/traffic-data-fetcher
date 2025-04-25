@@ -14,17 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import argparse
 import csv
 
 from trafficdatafetcher import apiclient
-
-
-def positive_value(value):
-    int_value = int(value)
-    if int_value <= 0:
-        raise argparse.ArgumentTypeError("%s is an invalid positive int value" % value)
-    return int_value
 
 
 def fetch_site_ids_for_domain(domain_id):
