@@ -119,3 +119,11 @@ Options:
   ```shell
   traffic-data-fetcher fetch-counts --sites 100019729 --begin 2025-04-05 --end 2025-04-07
   ```
+  
+## Acknowledgements
+
+Special thanks to Pascua Theus for providing the groundwork for accessing Eco Counter's API in
+his [blog post on counting bicycles](https://theus.name/2019/06/01/fahrraeder-zaehlen/) and to
+the [Bundesstelle for Open Data](https://github.com/bundesAPI) for their documentation of
+the [Eco-Visio-API](https://github.com/bundesAPI/eco-visio-api).
+Their contributions were essential to making this project possible.
