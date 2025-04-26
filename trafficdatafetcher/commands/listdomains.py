@@ -19,7 +19,7 @@ from enum import auto
 
 from trafficdatafetcher import apiclient
 from trafficdatafetcher.types import EnumWithLowerCaseNames
-from trafficdatafetcher.utilfunctions import open_csv
+from trafficdatafetcher.csvutils import open_csv
 
 
 class Columns(EnumWithLowerCaseNames):

@@ -19,7 +19,7 @@ from enum import auto
 
 from trafficdatafetcher import apiclient
 from trafficdatafetcher.apiclient import MeansOfTransport
-from trafficdatafetcher.utilfunctions import fetch_site_ids_for_domain, open_csv
+from trafficdatafetcher.csvutils import open_csv
 from trafficdatafetcher.types import EnumWithLowerCaseNames
 
 
@@ -29,6 +29,7 @@ class Columns(EnumWithLowerCaseNames):
     NAME = auto()
     LATITUDE = auto()
     LONGITUDE = auto()
+    PUBLIC = auto()
     DIRECTION_IN = auto()
     DIRECTION_OUT = auto()
     MEANS_OF_TRANSPORT_COUNT = auto()
@@ -59,25 +60,66 @@ def register_argparser(subparsers):
 
 def list_sites(domain_id, site_ids, file, **kwargs):
     if domain_id is not None:
-        site_ids = fetch_site_ids_for_domain(domain_id)
-    _fetch_and_save_sites(file, site_ids)
+        _fetch_and_save_all_sites_in_domain(domain_id, file)
+    else:
+        _fetch_and_save_sites(file, site_ids)
+
+
+def _fetch_and_save_all_sites_in_domain(domain_id, file):
+    csv_file = open_csv(file, Columns)
+    sites = apiclient.fetch_sites_in_domain(domain_id)
+    for site in sites:
+        if site["lienPublic"] is None:
+            site_row = _map_site_to_row(domain_id, site)
+        else:
+            public_site_id = site["lienPublic"]
+            public_site = apiclient.fetch_site(public_site_id)
+            site_row = _map_public_site_to_row(public_site)
+        csv_file.writerow(site_row)
 
 
 def _fetch_and_save_sites(file, site_ids):
     csv_file = open_csv(file, Columns)
     for site_id in site_ids:
         site = apiclient.fetch_site(site_id)
-        site_row = _map_site_to_row(site)
+        site_row = _map_public_site_to_row(site)
         csv_file.writerow(site_row)
 
 
-def _map_site_to_row(site):
+def _map_site_to_row(domain_id, site):
+    return {
+        Columns.ID: site["idPdc"],
+        Columns.DOMAIN_ID: domain_id,
+        Columns.NAME: site["nom"],
+        Columns.LATITUDE: site["lat"],
+        Columns.LONGITUDE: site["lon"],
+        Columns.PUBLIC: False,
+        Columns.DIRECTION_IN: "",
+        Columns.DIRECTION_OUT: "",
+        Columns.MEANS_OF_TRANSPORT_COUNT: _calculate_means_of_transport_count(
+            site["pratique"]),
+        Columns.MAIN_MEANS_OF_TRANSPORT:
+            MeansOfTransport(site["mainPratique"]),
+        Columns.START_OF_COLLECTION: "",
+        Columns.MESSAGE: site["publicMessage"]
+     }
+
+
+def _calculate_means_of_transport_count(counters):
+    means_of_transports = {}
+    for counter in counters:
+        means_of_transports[counter["pratique"]] = True
+    return len(means_of_transports)
+
+
+def _map_public_site_to_row(site):
     return {
         Columns.ID: site["idPdc"],
         Columns.DOMAIN_ID: site["domaine"],
         Columns.NAME: site["titre"],
         Columns.LATITUDE: site["latitude"],
         Columns.LONGITUDE: site["longitude"],
+        Columns.PUBLIC: True,
         Columns.DIRECTION_IN: site["directionIn"],
         Columns.DIRECTION_OUT: site["directionOut"],
         Columns.MEANS_OF_TRANSPORT_COUNT: site["nbPratiques"],

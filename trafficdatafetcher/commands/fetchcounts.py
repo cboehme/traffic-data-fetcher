@@ -20,7 +20,7 @@ from enum import auto
 
 from trafficdatafetcher import apiclient
 from trafficdatafetcher.apiclient import StepSize, Direction, MeansOfTransport
-from trafficdatafetcher.utilfunctions import fetch_site_ids_for_domain, open_csv
+from trafficdatafetcher.csvutils import open_csv
 from trafficdatafetcher.types import EnumWithLowerCaseNames
 
 
@@ -82,7 +82,8 @@ def register_argparser(subparsers):
 
 def fetch_data(domain_id, site_ids, step_size, file, begin, end, direction, means_of_transport, **kwargs):
     if domain_id is not None:
-        site_ids = fetch_site_ids_for_domain(domain_id)
+        sites = apiclient.fetch_sites_in_domain(domain_id)
+        site_ids = [site["lienPublic"] for site in sites if site["lienPublic"] is not None]
 
     csv_file = open_csv(file, Columns)
     for site_id in site_ids:

@@ -73,6 +73,8 @@ def fetch_domains():
 def fetch_sites_in_domain(domain_id: int):
     """
     Retrieves a list of all available counter sites in the given domain.
+    This list includes public counter sites as well as non-public sites.
+    Only data from public sites can be retrieved via the API.
     """
     url = f"https://www.eco-visio.net/api/aladdin/1.0.0/pbl/publicwebpageplus/{domain_id}?withNull=true"
     try:

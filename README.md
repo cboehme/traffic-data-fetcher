@@ -18,11 +18,15 @@ python3 -m pipx run traffic-data-fetcher YOUR-ARGS-HERE
 ## Organisation of the traffic monitoring stations
 
 Eco Counter calls their traffic monitoring stations counter sites. 
-A **counter-site** groups counters positioned at the same location. 
+A **counter site** groups counters positioned at the same location. 
 A **counter** collects data for a specific means of transport and a specific direction of travel.
-Each counter-site belongs to a domain.
+Each counter site belongs to a domain.
 A **domain** groups a number of counter sites which are typically operated by a city or district 
 administration.
+
+A counter site may be either *public* or *non-public*. Detailed traffic data separated by 
+direction is only available for public sites. Traffic Data Fetcher currently does not support 
+fetching data from non-public sites.
 
 ## Usage
 
@@ -49,8 +53,9 @@ Options:
 
 ### List counter sites
 
-Retrieves detailed information for all *public* counter sites within a specified domain, or for the 
-provided counter sites.
+Retrieves detailed information for all (*public* and *non-public*) counter sites within a specified 
+domain, or for the provided counter sites. If individual counter sites are queried, only *public* 
+sites can be retrieved.
 
 Usage: `traffic-data-fetcher list-sites [-h] (-d DOMAIN_ID | -s SITE_IDS [SITE_IDS ...]) [-f FILE]`
 
@@ -62,7 +67,8 @@ Options:
 
 ### Fetch counter data
 
-Retrieves traffic data from all counter sites within a specified domain or from the provided counter sites. 
+Retrieves traffic data from all *public* counter sites within a specified domain or from the provided *public* 
+counter sites. 
 The returned data can be filtered by means of transport and direction, and constrained by time range and temporal 
 resolution.
 
