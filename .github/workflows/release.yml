@@ -1,4 +1,4 @@
-name: Create Release and Publish to PyPI
+name: Create release and publish to PyPI
 
 on:
   push:
@@ -23,8 +23,7 @@ jobs:
         pip install -r requirements.txt
     
     - name: Build package
-      run: |
-        python -m build
+      run: python -m build
     
     - name: Upload distribution
       uses: actions/upload-artifact@v4
